@@ -112,7 +112,7 @@ li{border-bottom:1px solid var(--linea)}
       <summary>Reglas y respaldo</summary>
       <p class="reglas">
         Cada día debes 1 episodio. Si un día no cubres lo que debes, al día siguiente se suma lo que quedó faltando más la cantidad de títulos que estés viendo. Eso se repite todos los días, aunque veas algo, hasta el día en que pagues la deuda completa; ahí vuelve a 1 diario.<br><br>
-        Ves 10 episodios de un título y pasas al siguiente. También cambias si se acaba la temporada según los episodios que le hayas cargado; si era la última parte, el título se da por terminado.<br><br>El primer día de cada mes entra un título de cada lista. Si terminas todo antes, entra uno nuevo enseguida.
+        Ves 10 episodios de un título y pasas al siguiente. También cambias si se acaba la temporada según los episodios que le hayas cargado; si era la última parte, el título se da por terminado.<br><br>El primer día de cada mes entra un título de cada lista. Si terminas todo antes del 1, entran tres enseguida, uno de cada lista.
       </p>
       <button class="btn sec" id="exportar">Descargar copia de respaldo</button>
       <button class="btn sec" id="importar">Cargar una copia</button>
@@ -200,10 +200,8 @@ function sorteoDelMes(){
 }
 function rellenarSiVacio(){
   if(S.items.some(i=>i.lista==='viendo')) return;
-  const pools = ['recom','vistas','porver'].filter(l=>S.items.some(i=>i.lista===l));
-  if(!pools.length) return;
-  const n = sacarUno(pools[Math.floor(Math.random()*pools.length)]);
-  if(n) aviso = 'Terminaste todo, entra: ' + n;
+  const salieron = ['recom','vistas','porver'].map(sacarUno).filter(Boolean);
+  if(salieron.length) aviso = 'Terminaste todo, entran: ' + salieron.join(' · ');
 }
 
 /* ---------- turno actual ---------- */
