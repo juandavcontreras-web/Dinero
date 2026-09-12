@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VM-01 · Lista de materiales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --panel:#F2F1EC;
+  --panel-2:#FBFAF7;
+  --edge:#DAD7CC;
+  --edge-2:#C3BFB2;
+  --ink:#1F2421;
+  --ink-2:#5C6159;
+  --ink-3:#8A8E84;
+  --screen:#0C1712;
+  --screen-2:#16261F;
+  --phos:#5FD3A4;
+  --phos-dim:#2F6B54;
+  --crit:#A8443E;
+  --warn:#9A6A12;
+  --ok:#3F7A45;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--panel);
+  color:var(--ink);
+  font:400 16px/1.6 Archivo,system-ui,sans-serif;
+  padding-bottom:72px;
+}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+
+/* ---------- readout ---------- */
+.readout{
+  background:var(--screen);
+  border-bottom:3px solid var(--edge-2);
+}
+.readout .wrap{padding-top:26px;padding-bottom:26px}
+.rid{
+  font:500 13px/1 "IBM Plex Mono",monospace;
+  color:var(--phos-dim);
+  letter-spacing:.14em;
+  margin:0 0 18px;
+}
+.screen{
+  background:var(--screen-2);
+  border:1px solid #22392F;
+  border-radius:3px;
+  padding:16px 18px;
+  font:400 15px/1.9 "IBM Plex Mono",monospace;
+  color:var(--phos);
+  overflow-x:auto;
+  white-space:pre;
+  text-shadow:0 0 8px rgba(95,211,164,.28);
+}
+.screen b{font-weight:500;color:#9BEBC8}
+.title{
+  margin:22px 0 4px;
+  font:600 30px/1.15 Archivo,sans-serif;
+  color:#EDF6F1;
+  letter-spacing:-.015em;
+}
+.sub{margin:0;color:#7FA394;font-size:15px}
+
+/* ---------- controls ---------- */
+.bar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(242,241,236,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--edge);
+}
+.bar .wrap{display:flex;gap:8px;align-items:center;padding-top:11px;padding-bottom:11px;overflow-x:auto}
+.chip{
+  flex:none;
+  font:500 14px/1 Archivo,sans-serif;
+  color:var(--ink-2);
+  background:var(--panel-2);
+  border:1px solid var(--edge);
+  border-radius:999px;
+  padding:9px 15px;
+  cursor:pointer;
+}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--panel-2);border-color:var(--ink)}
+.chip:focus-visible,.box:focus-visible,summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.reset{margin-left:auto;flex:none;border:0;background:none;color:var(--ink-3);font:400 14px Archivo,sans-serif;cursor:pointer;padding:9px 4px}
+
+/* ---------- sections ---------- */
+section{margin:36px 0 0}
+.head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+h2{margin:0;font:600 21px/1.25 Archivo,sans-serif;letter-spacing:-.01em}
+.count{font:500 13px "IBM Plex Mono",monospace;color:var(--ink-3)}
+.lead{margin:0 0 16px;color:var(--ink-2);font-size:15px;max-width:62ch}
+
+.rows{border:1px solid var(--edge);border-radius:4px;background:var(--panel-2);overflow:hidden}
+.row{display:flex;gap:13px;padding:15px 16px;border-top:1px solid var(--edge);align-items:flex-start}
+.row:first-child{border-top:0}
+.row.done{background:#EEEDE7}
+.row.done .name{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--edge-2)}
+.row.done .why{color:var(--ink-3)}
+.box{
+  flex:none;width:21px;height:21px;margin-top:2px;
+  border:1.5px solid var(--edge-2);border-radius:3px;
+  background:#fff;cursor:pointer;padding:0;
+  display:grid;place-items:center;
+}
+.box[aria-checked="true"]{background:var(--ink);border-color:var(--ink)}
+.box svg{opacity:0;width:12px;height:12px}
+.box[aria-checked="true"] svg{opacity:1}
+.body{flex:1;min-width:0}
+.name{font-weight:500;line-height:1.4}
+.pn{font:400 13px "IBM Plex Mono",monospace;color:var(--ink-2)}
+.why{margin:3px 0 0;font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.qty{
+  flex:none;font:500 13px "IBM Plex Mono",monospace;
+  color:var(--ink-2);background:var(--panel);
+  border:1px solid var(--edge);border-radius:3px;
+  padding:3px 8px;margin-top:1px;
+}
+.pri{flex:none;width:4px;align-self:stretch;border-radius:2px;margin:2px 0}
+.p-c{background:var(--crit)}
+.p-i{background:var(--warn)}
+.p-f{background:var(--ok);opacity:.55}
+
+details{margin-top:12px;border:1px solid var(--edge);border-radius:4px;background:var(--panel-2)}
+summary{cursor:pointer;padding:13px 16px;font-weight:500;font-size:15px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";display:inline-block;width:18px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+details[open] summary::before{content:"–"}
+.note{padding:0 16px 16px;font-size:15px;color:var(--ink-2)}
+.note p{margin:0 0 11px}
+.note p:last-child{margin-bottom:0}
+.note strong{color:var(--ink);font-weight:500}
+.note table{width:100%;border-collapse:collapse;font-size:14px;margin:4px 0 12px}
+.note th,.note td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--edge)}
+.note th{font-weight:500;color:var(--ink);font-size:13px}
+.note code{font:400 13px "IBM Plex Mono",monospace;background:var(--panel);padding:1px 5px;border-radius:3px}
+
+.flag{border-left:3px solid var(--crit);background:#FAF3F2;padding:13px 15px;margin:20px 0;font-size:15px;border-radius:0 4px 4px 0}
+.flag strong{display:block;font-weight:500;margin-bottom:3px}
+
+.limits{display:grid;gap:14px;margin-top:16px}
+@media(min-width:640px){.limits{grid-template-columns:1fr 1fr}}
+.limit{border:1px solid var(--edge);border-radius:4px;background:var(--panel-2);padding:16px}
+.limit h3{margin:0 0 7px;font:500 16px Archivo,sans-serif}
+.limit p{margin:0 0 9px;font-size:14.5px;color:var(--ink-2);line-height:1.55}
+.limit p:last-child{margin-bottom:0}
+
+.sched{width:100%;border-collapse:collapse;font-size:15px;margin-top:14px}
+.sched td{padding:11px 10px;border-bottom:1px solid var(--edge);vertical-align:top}
+.sched td:first-child{width:52px;font:500 13px "IBM Plex Mono",monospace;color:var(--ink-3)}
+
+footer{margin:56px 0 0;padding-top:22px;border-top:1px solid var(--edge);color:var(--ink-3);font-size:14px}
+
+/* ---------- aportes ---------- */
+#money{margin-top:36px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:4px;overflow:hidden;margin-bottom:18px}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--panel-2);padding:14px 15px}
+.stat .lbl{font-size:13px;color:var(--ink-3);margin-bottom:3px}
+.stat .val{font:500 20px/1.2 "IBM Plex Mono",monospace;color:var(--ink)}
+.stat.due .val{color:var(--crit)}
+.stat.paid .val{color:var(--ok)}
+
+.form{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 16px}
+.form input{
+  font:400 15px Archivo,sans-serif;color:var(--ink);
+  background:var(--panel-2);border:1px solid var(--edge-2);
+  border-radius:4px;padding:11px 12px;min-width:0;
+}
+.form input[name=n]{flex:1 1 150px}
+.form input[name=p]{flex:0 1 120px;font-family:"IBM Plex Mono",monospace}
+.form button{
+  flex:none;font:500 15px Archivo,sans-serif;
+  background:var(--ink);color:var(--panel-2);
+  border:0;border-radius:4px;padding:11px 18px;cursor:pointer;
+}
+.form input:focus-visible,.form button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+.buys{border:1px solid var(--edge);border-radius:4px;background:var(--panel-2);overflow:hidden}
+.buy{display:flex;gap:12px;align-items:center;padding:12px 15px;border-top:1px solid var(--edge)}
+.buy:first-child{border-top:0}
+.buy .bn{flex:1;min-width:0;font-size:15px;overflow-wrap:anywhere}
+.buy .bp{font:500 14px "IBM Plex Mono",monospace;color:var(--ink-2)}
+.buy .del{flex:none;border:0;background:none;color:var(--ink-3);font-size:20px;line-height:1;cursor:pointer;padding:2px 6px}
+.empty{padding:18px 15px;color:var(--ink-3);font-size:15px}
+
+.people{display:grid;gap:12px;margin-top:16px}
+@media(min-width:560px){.people{grid-template-columns:1fr 1fr}}
+@media(min-width:860px){.people{grid-template-columns:repeat(3,1fr)}}
+.person{border:1px solid var(--edge);border-radius:4px;background:var(--panel-2);padding:15px}
+.person.ok{border-color:#B9D3BC;background:#F4F8F3}
+.pname{font-weight:500;font-size:17px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.pname .tick{color:var(--ok);font-size:14px;font-weight:400}
+.pline{display:flex;justify-content:space-between;font-size:14.5px;color:var(--ink-2);margin-bottom:4px}
+.pline b{font:500 14.5px "IBM Plex Mono",monospace;color:var(--ink)}
+.pline.d b{color:var(--crit)}
+.track{height:5px;background:var(--edge);border-radius:3px;margin:10px 0 12px;overflow:hidden}
+.fill{height:100%;background:var(--ok);border-radius:3px;transition:width .25s}
+.padd{display:flex;gap:7px}
+.padd input{
+  flex:1;min-width:0;font:400 14px "IBM Plex Mono",monospace;
+  background:#fff;border:1px solid var(--edge-2);border-radius:4px;padding:9px 10px;color:var(--ink);
+}
+.padd button{flex:none;border:1px solid var(--edge-2);background:var(--panel);border-radius:4px;padding:9px 13px;font:500 14px Archivo,sans-serif;color:var(--ink);cursor:pointer}
+.padd input:focus-visible,.padd button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.hist{margin-top:9px;font:400 13px "IBM Plex Mono",monospace;color:var(--ink-3);line-height:1.7}
+.hist span{cursor:pointer;border-bottom:1px dotted var(--edge-2)}
+</style>
+</head>
+<body>
+
+<header class="readout">
+  <div class="wrap">
+    <p class="rid">VM-01 / LISTA DE MATERIALES</p>
+    <div class="screen" id="screen">cargando…</div>
+    <h1 class="title">Ventilador mecánico</h1>
+    <p class="sub">Juan David Cabarcas Contreras · Ingeniería Biomédica</p>
+  </div>
+</header>
+
+<nav class="bar">
+  <div class="wrap">
+    <button class="chip" id="f-all" aria-pressed="true">Todo</button>
+    <button class="chip" id="f-pend" aria-pressed="false">Pendiente</button>
+    <button class="chip" id="f-crit" aria-pressed="false">Solo crítico</button>
+    <button class="reset" id="reset">Borrar marcas</button>
+  </div>
+</nav>
+
+<div class="wrap" id="money"></div>
+
+<main class="wrap" id="main"></main>
+
+<script>
+const D=[
+{s:"Control y electrónica",lead:"Cerebro del equipo, interfaz de usuario y captura de datos.",
+ items:[
+ ["c","Arduino Mega 2560","","1","Ejecuta la lógica de ciclos, lee el sensor y comanda las válvulas"],
+ ["c","Pantalla LCD 20x4 con módulo I2C","PCF8574","1","Muestra frecuencia, volumen, presión, relación I:E y alarmas"],
+ ["c","Encoder rotatorio","KY-040","1","Ajusta parámetros y navega el menú con un solo control"],
+ ["i","Buzzer pasivo 5V","","1","Alarma audible con tonos distintos según la prioridad"],
+ ["c","Sensor de presión","HX710B · 0–40 kPa","3","Mide presión de vía aérea; habilita alarmas y modo por presión"],
+ ["i","Protoboard 830 puntos","","1","Validar el circuito antes de fabricar la placa"],
+ ["i","Kit de cables Dupont","M-M y M-H","1","Interconexión durante las pruebas"]],
+ notes:[["Prioridad de compra y asignación de pines",
+ "<p>El sensor HX710B tarda de dos a tres semanas en llegar. <strong>Debe ser el primer pedido que salga.</strong></p><p>Al recibir la pantalla, confirmar que el módulo I2C viene ya soldado atrás. Algunas publicaciones venden la LCD sola.</p><table><tr><th>Pin</th><th>Función</th><th>Pin</th><th>Función</th></tr><tr><td><code>20</code></td><td>SDA pantalla</td><td><code>6</code></td><td>Buzzer</td></tr><tr><td><code>21</code></td><td>SCL pantalla</td><td><code>22</code></td><td>Piloto verde</td></tr><tr><td><code>8</code></td><td>Válvula inspiratoria</td><td><code>24</code></td><td>Piloto amarillo</td></tr><tr><td><code>9</code></td><td>Válvula espiratoria</td><td><code>26</code></td><td>Piloto azul</td></tr><tr><td><code>2</code></td><td>Encoder CLK</td><td><code>28</code></td><td>Piloto rojo</td></tr><tr><td><code>3</code></td><td>Encoder DT</td><td><code>30</code></td><td>Sensor OUT</td></tr><tr><td><code>4</code></td><td>Encoder SW</td><td><code>31</code></td><td>Sensor SCK</td></tr><tr><td><code>5</code></td><td>Botón de silencio</td><td></td><td></td></tr></table><p>Los pines <code>2</code> y <code>3</code> son de interrupción por hardware, así que el encoder no pierde pasos aunque el programa esté ocupado.</p>"]]},
+
+{s:"Etapa de potencia",lead:"Traduce las señales de 5V del Arduino a los 12V que necesitan las cargas.",
+ items:[
+ ["c","MOSFET IRLZ44N","","3","Conmuta las electroválvulas. Nivel lógico, opera con 5V de compuerta"],
+ ["i","Transistor 2N2222","","6","Conmuta los pilotos de 12V desde pines de 5V"],
+ ["c","Diodo 1N4007","","10","Flyback sobre cada bobina y protección de polaridad en VIN"],
+ ["c","Resistencia 220Ω","","10","En serie con la compuerta de cada MOSFET"],
+ ["i","Resistencia 1kΩ","","10","Base de los transistores de los pilotos"],
+ ["c","Resistencia 10kΩ","","10","Pull-down de compuerta; evita que la válvula se active al arrancar"],
+ ["i","Condensador 1000µF","25V","1","Absorbe los picos de corriente al conmutar las válvulas"],
+ ["i","Condensador 100µF","25V","1","Estabiliza la entrada de alimentación del Arduino"],
+ ["f","Disipador TO-220","","2","Refrigera los MOSFET en operación continua"]],
+ notes:[["Elección del MOSFET",
+ "<p>La referencia <strong>debe llevar la letra L</strong>, de nivel lógico: <code>IRLZ44N</code>, <code>IRL540N</code>, <code>IRLB8721</code>, <code>FQP30N06L</code>.</p><p>Los modelos sin L —<code>IRF520</code>, <code>IRF540</code>, <code>IRFZ44</code>— necesitan 10V en la compuerta. Con los 5V del Arduino conducen a medias, se calientan y fallan de forma intermitente. Es el error más común en este montaje.</p><p>Para verificar en la tienda: en la hoja de datos, <code>V_GS(th)</code> debe ser menor a 2V y las curvas deben dar corriente a <code>V_GS = 4.5V</code>.</p>"],
+ ["Circuito por cada válvula",
+ "<p>Pin del Arduino a resistencia de 220Ω, y de ahí a la compuerta. Resistencia de 10kΩ entre compuerta y masa. El drenador va al negativo de la bobina y el surtidor a masa.</p><p>El diodo flyback va en paralelo con la bobina, con la <strong>banda hacia el positivo</strong>. No es opcional: sin él, el pico de voltaje al cerrar destruye el MOSFET.</p>"]]},
+
+{s:"Alimentación",lead:"Los 110V permanecen fuera del gabinete. Solo entran 12V.",
+ items:[
+ ["c","Fuente conmutada 12V / 3A","36W","1","Alimenta válvulas, pilotos y Arduino. Queda externa al equipo"],
+ ["c","Jack DC hembra de panel","5.5 × 2.1 mm","1","Entrada de 12V en la cara trasera, con tuerca de fijación"],
+ ["i","Cable con plug DC macho","5.5 × 2.1 mm","1","Lleva los 12V de la placa al jack del Arduino"],
+ ["i","Interruptor basculante iluminado 12V","","1","Encendido del equipo, cortando la línea de 12V"],
+ ["c","Portafusible de panel con fusible 2A","","1","Protege la línea de potencia ante cortocircuito"],
+ ["c","Cable 20 AWG rojo y negro","","2 m","Distribución interna de los 12V"]],
+ notes:[["Cálculo de carga",
+ "<table><tr><th>Carga</th><th>Consumo</th></tr><tr><td>Válvula inspiratoria</td><td>0,58 A</td></tr><tr><td>Válvula espiratoria</td><td>0,58 A</td></tr><tr><td>Arduino, pantalla, sensor y encoder</td><td>0,30 A</td></tr><tr><td>Cuatro pilotos</td><td>0,08 A</td></tr><tr><th>Total</th><th>1,54 A</th></tr><tr><th>Capacidad de la fuente</th><th>3,00 A</th></tr></table><p>Una fuente de 1A no alcanza. El amperaje de más nunca es problema: el circuito toma solo lo que consume. El <strong>voltaje sí debe coincidir exactamente</strong>.</p>"]]},
+
+{s:"Conectores y cableado",lead:"Todo lo que sale de la placa va con conector desmontable. Abrir el equipo no debe requerir desoldar.",
+ items:[
+ ["c","Bornera enchufable KF2EDG 2 vías","","4","Potencia: entrada de 12V, las dos válvulas y el interruptor"],
+ ["c","Kit JST XH con crimpadora","","1","Señal: pantalla, encoder, sensor, pilotos, botón y buzzer"],
+ ["i","Header macho 2.54 mm","tira","2","Puntos de conexión de la placa hacia el Arduino"],
+ ["c","Cable multifilar 22 AWG","varios colores","5 m","Latiguillos entre la placa y los componentes del panel"],
+ ["i","Kit de termorretráctil","surtido","1","Aislar cada empalme"],
+ ["f","Amarres con base adhesiva","","1 paq.","Organizar el cableado interno"]],
+ notes:[["Mapa de conectores de la placa",
+ "<table><tr><th>Conector</th><th>Tipo</th><th>Vías</th><th>Destino</th></tr><tr><td>12V IN</td><td>KF2EDG</td><td>2</td><td>Jack de panel</td></tr><tr><td>SW + FUSE</td><td>KF2EDG</td><td>2</td><td>Interruptor y fusible</td></tr><tr><td>VALV-INSP</td><td>KF2EDG</td><td>2</td><td>Válvula inspiratoria</td></tr><tr><td>VALV-ESP</td><td>KF2EDG</td><td>2</td><td>Válvula espiratoria</td></tr><tr><td>LCD</td><td>JST XH</td><td>4</td><td>VCC, GND, SDA, SCL</td></tr><tr><td>ENCODER</td><td>JST XH</td><td>5</td><td>+, GND, CLK, DT, SW</td></tr><tr><td>SENSOR</td><td>JST XH</td><td>4</td><td>VCC, GND, OUT, SCK</td></tr><tr><td>LEDS</td><td>JST XH</td><td>5</td><td>Cuatro señales y masa común</td></tr><tr><td>MUTE</td><td>JST XH</td><td>2</td><td>Botón de silencio</td></tr><tr><td>BUZZ</td><td>JST XH</td><td>2</td><td>Buzzer</td></tr></table><p><strong>Regla de seguridad.</strong> KF2EDG solo para potencia, JST XH solo para señal. Al ser físicamente incompatibles, es imposible enchufar 12V donde va una señal de 5V.</p><p>Rotular cada conector en la placa. Es lo que evita errores al rearmar el equipo semanas después.</p>"]]},
+
+{s:"Interfaz de panel",lead:"Lo que el operador ve y toca.",
+ items:[
+ ["i","Pilotos LED de panel Ø8 mm","set de 10 mixtos","1","Indicadores de red, inspiración, espiración y alarma"],
+ ["i","Pulsador de panel","","1","Silencio de alarma. Botón físico independiente y accesible"]],
+ notes:[["Código de indicadores",
+ "<table><tr><th>Color</th><th>Estado</th><th>Significado</th></tr><tr><td>Verde</td><td>Red</td><td>Equipo energizado, operación normal</td></tr><tr><td>Amarillo</td><td>Insp</td><td>Fase inspiratoria activa</td></tr><tr><td>Azul</td><td>Esp</td><td>Fase espiratoria activa</td></tr><tr><td>Rojo</td><td>Alarma</td><td>Presión fuera de rango o desconexión</td></tr></table><p>Los indicadores de fase permiten seguir el ciclo respiratorio sin mirar la pantalla, lo que se aprecia mucho en la sustentación.</p><p>Si los pilotos son de 12V requieren los transistores 2N2222. La versión de 5V se conecta directo al Arduino y permite omitirlos.</p>"]]},
+
+{s:"Neumática del equipo",lead:"Todo lo que va dentro del gabinete, desde la entrada de aire hasta los puertos del paciente.",
+ items:[
+ ["c","Electroválvula Airtac 2V130-10","12V DC · orificio 13 mm · 3/8\"","1","Inspiratoria. Alto caudal, opera con los 2–3 bar del regulador"],
+ ["c","Electroválvula Airtac 2V025-08F","12V DC · orificio 2,5 mm · 1/4\"","1","Espiratoria. Acción directa, abre desde 0 bar"],
+ ["c","Regulador de presión con manómetro","","1","Baja la presión del cilindro a 2–3 bar de trabajo"],
+ ["c","Válvula de aguja 1/4\"","","1","Limita el caudal inspiratorio y calibra el volumen entregado"],
+ ["i","Filtro neumático miniatura","","2","Retiene partículas en la entrada y en el escape"],
+ ["c","Racor recto o codo","PC 8-03 / PL 8-03","2","Conexión de manguera a la válvula inspiratoria"],
+ ["c","Racor recto o codo","PC 6-02 / PL 6-02","2","Conexión de manguera a la válvula espiratoria"],
+ ["c","Passamuro","PM 6","4","Entrada de aire, escape, puerto inspiratorio y espiratorio"],
+ ["c","T neumática","PE 6","1","Derivación de la línea inspiratoria hacia el sensor"],
+ ["c","Manguera de poliuretano 6 mm","","2 m","Interconexión interna"],
+ ["c","Manguera de silicona 4 mm","","0,5 m","Derivación al sensor de presión"],
+ ["c","Teflón","","1","Sellado de todas las roscas"]],
+ notes:[["Por qué estas válvulas y no otras",
+ "<table><tr><th>Serie</th><th>Orificio</th><th>Presión mínima</th><th>Apta para</th></tr><tr><td>2V025</td><td>2,5 mm</td><td>0 bar, acción directa</td><td>Ambos lados</td></tr><tr><td>2V130</td><td>13 mm</td><td>0,5 bar, piloto interno</td><td>Solo inspiratorio</td></tr><tr><td>2V250</td><td>25 mm</td><td>0,5 bar, piloto interno</td><td>Solo inspiratorio</td></tr><tr><td>4V210 / 4V220</td><td>—</td><td>1,5 bar, 5/2 vías</td><td>No aptas</td></tr></table><p><strong>Lado inspiratorio.</strong> Dispone de 2–3 bar del regulador, así que la 2V130-10 opera sin problema y su orificio de 13 mm multiplica el caudal frente a los 2,5 mm.</p><p><strong>Lado espiratorio.</strong> El aire sale del pulmón a unos 0,03 bar. Solo una válvula de acción directa abre en ese rango, y la 2V025 es la mayor de esa familia. Se compensa con tiempos espiratorios largos.</p><p>Las 4V210 y 4V220 no sirven aunque sean más baratas: son válvulas 5/2 diseñadas para accionar cilindros neumáticos, no para dirigir flujo respiratorio.</p>"],
+ ["Recorrido del aire",
+ "<p><strong>Rama inspiratoria.</strong> Entrada trasera, filtro, válvula de aguja, válvula inspiratoria, T de derivación y puerto inspiratorio. De la T sale una manguerita fina hacia el sensor.</p><p><strong>Rama espiratoria.</strong> Puerto espiratorio, válvula espiratoria y escape trasero con filtro.</p><p>La válvula de aguja va <strong>antes</strong> de la electroválvula. Si se instala después, el golpe de presión llega al paciente antes de ser limitado.</p>"]],
+ flag:["Usar aire comprimido, no oxígeno","Las válvulas neumáticas industriales vienen lubricadas de fábrica. El oxígeno a presión en contacto con aceites o grasas representa riesgo de ignición. El uso con oxígeno exige válvulas certificadas, libres de hidrocarburos en cuerpo y sellos."]},
+
+{s:"Circuito del paciente",lead:"Va por fuera del equipo. Gestionar en la clínica antes de comprar: son insumos desechables que se descartan tras su uso.",
+ items:[
+ ["c","Manguera corrugada 22 mm","","2 m","Ramas inspiratoria y espiratoria hacia el paciente"],
+ ["c","Pieza en Y 22 mm","","1","Une las dos ramas justo antes del paciente"],
+ ["c","T de 22 mm","","1","Soporta la válvula de alivio en la rama inspiratoria"],
+ ["c","Válvula PEEP o pop-off","~40 cmH₂O","1","Seguridad mecánica, independiente del software"],
+ ["i","Adaptadores 22 mm a espiga","","4","Acople entre el circuito del paciente y los puertos del equipo"],
+ ["c","Pulmón de prueba o ambú","","1","Simula al paciente durante las pruebas"],
+ ["f","Filtro bacteriano","","1","Criterio clínico. Simbólico en el prototipo"]],
+ notes:[["Alternativa a la válvula PEEP: columna de agua",
+ "<p>El mismo principio se logra con un sello de agua: un tubo sumergido a la profundidad deseada dentro de un frasco. Si se sumerge 40 cm, el aire burbujea cuando la presión supera los 40 cmH₂O.</p><p>Es el mismo principio de los drenajes torácicos. Cuesta casi nada, el burbujeo es visible y audible, y permite explicar en la sustentación por qué la seguridad crítica no puede depender del software.</p>"],
+ ["Ubicación de la válvula de alivio",
+ "<p>Va fuera del equipo, intercalada en la manguera inspiratoria mediante una T de 22 mm, con la salida <strong>hacia arriba</strong> y lo más cerca posible de la pieza en Y.</p><p>Si se instala acostada o hacia abajo, el peso del mecanismo altera la presión de apertura y acumula condensación.</p>"]]},
+
+{s:"Gabinete y montaje",lead:"Formato vertical: 120 mm de ancho por 200 de alto y 75 de fondo.",
+ items:[
+ ["c","Caja plástica 200 × 120 × 75 mm","","1","Gabinete principal, montado en vertical"],
+ ["f","Vinilo adhesivo impreso","","1","Panel frontal. Se pega por dentro de la tapa, impreso en espejo"],
+ ["c","Tornillos M3 × 12 mm","cabeza plana negra","10","Fijación de la pantalla y las placas"],
+ ["c","Separadores hexagonales M3","6 mm, hembra-hembra","10","Espacio entre tapa y pantalla; evita forzar el vidrio"],
+ ["c","Tuercas y arandelas M3","","20","Complemento de la tornillería"],
+ ["f","Patas de goma adhesivas","","4","Estabilidad en formato vertical"],
+ ["i","Pasacables de goma","","6","Protegen el aislamiento en cada perforación"],
+ ["i","Abrazaderas para las válvulas","","2","Las fijan al fondo; evitan que cuelguen de las mangueras"],
+ ["i","Broca de copa y lima","","1","Perforaciones de Ø5, Ø8 y Ø12 mm"]],
+ notes:[["Plano de cortes del panel frontal",
+ "<p>Coordenadas desde la esquina superior izquierda de la tapa de 120 × 200 mm.</p><table><tr><th>Elemento</th><th>Centro</th><th>Corte</th></tr><tr><td>Ventana de la pantalla</td><td>60, 74</td><td>Rectángulo 98 × 38 mm</td></tr><tr><td>Encoder</td><td>60, 137</td><td>Ø 7 mm</td></tr><tr><td>Piloto verde</td><td>22, 188</td><td>Ø 8 mm</td></tr><tr><td>Piloto amarillo</td><td>47, 188</td><td>Ø 8 mm</td></tr><tr><td>Piloto azul</td><td>72, 188</td><td>Ø 8 mm</td></tr><tr><td>Piloto rojo</td><td>97, 188</td><td>Ø 8 mm</td></tr><tr><td>Botón de silencio</td><td>26, 218</td><td>Ø 12 mm</td></tr></table><p>El área visible de una LCD 20x4 ronda los 76 × 26 mm, pero el módulo completo mide 98 × 60. Medir la pantalla real antes de cortar.</p><p>Margen ajustado: 98 mm de pantalla sobre 120 de tapa dejan 11 mm por lado. Confirmar que los agujeros de montaje no choquen con las esquinas redondeadas.</p>"],
+ ["Distribución interna",
+ "<table><tr><th>Plano</th><th>Contenido</th></tr><tr><td>Tapa</td><td>Pantalla, encoder, pilotos, botón y buzzer</td></tr><tr><td>Medio</td><td>Arduino Mega vertical y placa de potencia</td></tr><tr><td>Fondo</td><td>Válvulas, filtro, válvula de aguja y sensor</td></tr></table><p><strong>Neumática atrás, electrónica adelante.</strong> Si hay fuga o condensación, no cae sobre la electrónica.</p><p>El punto más ajustado son las válvulas: suman unos 80 mm de ancho sobre 116 útiles. Medirlas antes de perforar. Si no caben, trasladarlas a un módulo neumático separado.</p>"]],
+ flag:["Orden de trabajo obligatorio","Perforar la tapa, pegar el vinilo y después montar los componentes. Si se pega el vinilo antes de perforar, la broca lo levanta. Al perforar plástico: broca nueva, velocidad baja y la tapa apoyada sobre madera."]},
+
+{s:"Fabricación de la placa",lead:"Método de transferencia térmica sobre baquelita de cobre, una sola cara.",
+ items:[
+ ["c","Baquelita virgen de cobre","una cara · 10 × 15 cm","2","Placa definitiva y una de repuesto para pruebas"],
+ ["c","Percloruro férrico","","250 g","Ataque químico que retira el cobre no protegido"],
+ ["c","Papel transfer o fotográfico brillante","","5","Soporte del tóner durante la transferencia"],
+ ["i","Acetona o thinner","","1","Limpieza del tóner después del ataque"],
+ ["i","Lija 600 o lana de acero fina","","1","Preparación del cobre antes de transferir"],
+ ["c","Recipiente plástico","nunca metálico","1","Contiene el ataque químico"],
+ ["c","Guantes de nitrilo y gafas","","1","Obligatorio durante el ataque"],
+ ["c","Brocas de 1 mm y 0,8 mm","","2","Perforación de los pads"],
+ ["c","Cautín 30–40W, estaño y flux","","1","Soldadura de los componentes"],
+ ["f","Barniz protector en aerosol","","1","Evita la oxidación del cobre expuesto"]],
+ notes:[["Reglas de diseño en KiCad",
+ "<table><tr><th>Tipo de pista</th><th>Ancho</th></tr><tr><td>Potencia: 12V y válvulas</td><td>1,5 a 2 mm</td></tr><tr><td>Señal de 5V</td><td>0,5 mm mínimo</td></tr></table><p><strong>Separar las zonas.</strong> Potencia en la mitad superior, señal en la inferior. Las válvulas generan picos al conmutar; si sus pistas corren junto a las del sensor, ese ruido contamina la lectura de presión.</p><p>Al ser de una sola cara, algunos cruces se resuelven con puentes de alambre. Dejarlos previstos en el diseño, no improvisados.</p><p>Cuidado con las huellas: JST XH es paso 2,5 mm, los headers Dupont 2,54 y las borneras KF2EDG 3,81 o 5,08. Elegir la equivocada impide montar el componente.</p>"],
+ ["Impresión y manejo del percloruro",
+ "<p>El patrón se pega contra el cobre, así que <strong>debe imprimirse en espejo</strong>. Requiere impresora láser: la de inyección no sirve porque el proceso depende del tóner.</p><p>El percloruro mancha de forma permanente ropa, mesones y pisos. Trabajar sobre periódico, en lugar ventilado, con guantes y gafas. No verterlo por el desagüe: neutralizarlo o llevarlo a un punto de residuos químicos.</p><p>El proceso sale mal las primeras veces. Por eso hay dos baquelitas en la lista.</p>"]]}
+];
+
+const SCHED=[["1","Pedir el sensor HX710B, que tarda de dos a tres semanas"],["1","Comprar la electrónica base y la etapa de potencia"],["2","Montar en protoboard y programar el ciclo respiratorio con LEDs"],["3","Menú de la pantalla y lectura del encoder"],["3–4","Esquemático y ruteado en KiCad"],["4","Fabricar, atacar y perforar la placa"],["5","Comprar y montar la neumática"],["6","Integrar el sensor y calibrarlo contra un manómetro de la clínica"],["7","Gabinete, vinilo y acabado"],["8","Pruebas integradas y ajuste de parámetros"],["9–10","Margen para imprevistos. No comprometer"]];
+
+const LIMITS=[
+["Válvulas on/off","Restringe los modos ventilatorios a controlados por volumen y por presión. No permite formas de onda variables, presión soporte ni modos asistidos.","Trabajo futuro: migrar a válvula proporcional con control PID."],
+["Volumen estimado","El equipo no incorpora sensor de flujo. El volumen mostrado se calcula del tiempo de apertura, calibrado contra una medición externa.","Trabajo futuro: integrar un sensor de flujo."],
+["Válvula espiratoria cerrada en reposo","Ante un corte de energía el circuito queda sellado. Un equipo clínico exigiría configuración normalmente abierta para permitir ventilación manual de rescate.","Aceptable en un prototipo de laboratorio con supervisión permanente. La válvula de alivio mitiga parcialmente el riesgo."],
+["Caudal espiratorio limitado","El orificio de 2,5 mm restringe la salida del aire y puede generar auto-PEEP a frecuencias altas.","Se mitiga operando entre 10 y 12 rpm, con relación I:E de 1:3 y volúmenes moderados."]];
+
+const SAFE=[
+["La válvula de alivio es independiente del software","Es la única protección activa si el Arduino se bloquea con la válvula inspiratoria abierta. En equipos médicos, la seguridad crítica nunca depende del programa."],
+["Masa común obligatoria","El negativo del Arduino y el de la fuente deben estar unidos. Sin ese punto común el circuito no conmuta, y es la falla más difícil de diagnosticar porque aparenta ser un error de programación."],
+["Etiquetar la entrada de aire","Conectar el cilindro sin regulador, a 150 bar, destruye válvulas y mangueras de forma inmediata."]];
+
+const PRI={c:["p-c","crítico"],i:["p-i","importante"],f:["p-f","acabado"]};
+const KEY="vm01";
+let state=JSON.parse(localStorage.getItem(KEY)||"{}");
+let filter="all";
+
+const main=document.getElementById("main");
+const scr=document.getElementById("screen");
+
+function id(s,i){return s+"-"+i}
+
+function build(){
+  let h="";
+  D.forEach((sec,si)=>{
+    h+=`<section data-sec="${si}"><div class="head"><h2>${sec.s}</h2><span class="count" id="cnt-${si}"></span></div><p class="lead">${sec.lead}</p><div class="rows">`;
+    sec.items.forEach((it,ii)=>{
+      const k=id(si,ii),on=!!state[k],p=PRI[it[0]];
+      h+=`<div class="row${on?" done":""}" data-k="${k}" data-p="${it[0]}">
+        <span class="pri ${p[0]}" title="${p[1]}"></span>
+        <button class="box" role="checkbox" aria-checked="${on}" aria-label="${it[1]}"><svg viewBox="0 0 12 12" fill="none"><path d="M1.5 6.2L4.3 9 10.5 2.6" stroke="#FBFAF7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="body"><span class="name">${it[1]}</span>${it[2]?` <span class="pn">${it[2]}</span>`:""}<span class="why">${it[4]}</span></span>
+        <span class="qty">${it[3]}</span></div>`;
+    });
+    h+=`</div>`;
+    if(sec.flag)h+=`<div class="flag"><strong>${sec.flag[0]}</strong>${sec.flag[1]}</div>`;
+    (sec.notes||[]).forEach(n=>{h+=`<details><summary>${n[0]}</summary><div class="note">${n[1]}</div></details>`});
+    h+=`</section>`;
+  });
+
+  h+=`<section><div class="head"><h2>Cronograma</h2></div><table class="sched">`;
+  SCHED.forEach(r=>{h+=`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`});
+  h+=`</table></section>`;
+
+  h+=`<section><div class="head"><h2>Limitaciones del diseño</h2></div><p class="lead">Decisiones deliberadas de alcance. Declararlas en el informe demuestra criterio de ingeniería; omitirlas deja la impresión de descuido.</p><div class="limits">`;
+  LIMITS.forEach(l=>{h+=`<div class="limit"><h3>${l[0]}</h3><p>${l[1]}</p><p>${l[2]}</p></div>`});
+  h+=`</div></section>`;
+
+  h+=`<section><div class="head"><h2>Seguridad</h2></div>`;
+  SAFE.forEach(s=>{h+=`<div class="flag"><strong>${s[0]}</strong>${s[1]}</div>`});
+  h+=`</section><footer>Documento de trabajo. Actualizar conforme avanza el proyecto.</footer>`;
+
+  main.innerHTML=h;
+}
+
+function totals(){
+  let t=0,d=0;
+  D.forEach((s,si)=>{
+    let st=0,sd=0;
+    s.items.forEach((_,ii)=>{st++;if(state[id(si,ii)])sd++});
+    const el=document.getElementById("cnt-"+si);
+    if(el)el.textContent=sd+" de "+st;
+    t+=st;d+=sd;
+  });
+  return[t,d];
+}
+
+function pad(s,n){return s.length>=n?s.slice(0,n):s+" ".repeat(n-s.length)}
+
+function readout(){
+  const[t,d]=totals();
+  const pc=Math.round(d/t*100);
+  const bars=Math.round(pc/5);
+  const bar="█".repeat(bars)+"·".repeat(20-bars);
+  let crit=0,critd=0;
+  D.forEach((s,si)=>s.items.forEach((it,ii)=>{if(it[0]==="c"){crit++;if(state[id(si,ii)])critd++}}));
+  scr.innerHTML=
+    pad("COMPRADO",10)+"<b>"+String(d).padStart(2)+" / "+t+"</b>\n"+
+    pad("CRITICO",10)+"<b>"+String(critd).padStart(2)+" / "+crit+"</b>\n"+
+    pad("AVANCE",10)+"<b>"+String(pc).padStart(2)+" %</b>\n"+
+    bar;
+}
+
+function applyFilter(){
+  document.querySelectorAll(".row").forEach(r=>{
+    const on=!!state[r.dataset.k];
+    let show=true;
+    if(filter==="pend")show=!on;
+    if(filter==="crit")show=r.dataset.p==="c";
+    r.style.display=show?"":"none";
+  });
+  document.querySelectorAll("section[data-sec]").forEach(s=>{
+    const any=[...s.querySelectorAll(".row")].some(r=>r.style.display!=="none");
+    s.style.display=any?"":"none";
+  });
+}
+
+main.addEventListener("click",e=>{
+  const b=e.target.closest(".box");if(!b)return;
+  const row=b.closest(".row"),k=row.dataset.k;
+  state[k]=!state[k];
+  if(!state[k])delete state[k];
+  localStorage.setItem(KEY,JSON.stringify(state));
+  b.setAttribute("aria-checked",state[k]?"true":"false");
+  row.classList.toggle("done",!!state[k]);
+  readout();
+  if(filter==="pend")applyFilter();
+});
+
+const chips={all:document.getElementById("f-all"),pend:document.getElementById("f-pend"),crit:document.getElementById("f-crit")};
+Object.entries(chips).forEach(([k,el])=>el.addEventListener("click",()=>{
+  filter=k;
+  Object.entries(chips).forEach(([k2,e2])=>e2.setAttribute("aria-pressed",k2===k?"true":"false"));
+  applyFilter();
+}));
+
+document.getElementById("reset").addEventListener("click",()=>{
+  if(!confirm("Se borran todas las marcas. ¿Continuar?"))return;
+  state={};localStorage.removeItem(KEY);
+  build();readout();applyFilter();
+});
+
+/* ---------- aportes ---------- */
+const PEOPLE=["Emanuel","Mario","Leonard","Laura","Julieth","Leydi"];
+const MKEY="vm01-money";
+let M=JSON.parse(localStorage.getItem(MKEY)||'{"buys":[],"pays":{}}');
+PEOPLE.forEach(p=>{if(!M.pays[p])M.pays[p]=[]});
+const money=document.getElementById("money");
+
+const cop=n=>"$"+Math.round(n).toLocaleString("es-CO");
+const saveM=()=>localStorage.setItem(MKEY,JSON.stringify(M));
+const num=s=>{const v=parseFloat(String(s).replace(/[^\d]/g,""));return isNaN(v)?0:v};
+
+function renderMoney(){
+  const total=M.buys.reduce((a,b)=>a+b.p,0);
+  const cuota=total/PEOPLE.length;
+  const paid=PEOPLE.reduce((a,p)=>a+M.pays[p].reduce((x,y)=>x+y,0),0);
+  const due=Math.max(0,total-paid);
+
+  let h=`<section><div class="head"><h2>Aportes</h2><span class="count">${PEOPLE.length} personas</span></div>
+  <p class="lead">El gasto total se divide en partes iguales entre seis personas. La cuota se recalcula sola cada vez que se registra una compra.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">Gastado</div><div class="val">${cop(total)}</div></div>
+    <div class="stat"><div class="lbl">Cuota por persona</div><div class="val">${cop(cuota)}</div></div>
+    <div class="stat paid"><div class="lbl">Recaudado</div><div class="val">${cop(paid)}</div></div>
+    <div class="stat due"><div class="lbl">Por recaudar</div><div class="val">${cop(due)}</div></div>
+  </div>
+
+  <h3 style="margin:26px 0 0;font:500 17px Archivo,sans-serif">Compras registradas</h3>
+  <div class="form">
+    <input name="n" id="bn" placeholder="Qué se compró" autocomplete="off">
+    <input name="p" id="bp" placeholder="Valor" inputmode="numeric" autocomplete="off">
+    <button id="badd">Agregar</button>
+  </div>
+  <div class="buys">`;
+
+  if(!M.buys.length){h+=`<div class="empty">Todavía no hay compras registradas.</div>`}
+  else{
+    M.buys.forEach((b,i)=>{
+      h+=`<div class="buy"><span class="bn">${b.n}</span><span class="bp">${cop(b.p)}</span><button class="del" data-buy="${i}" aria-label="Quitar ${b.n}">×</button></div>`;
+    });
+  }
+  h+=`</div>
+
+  <h3 style="margin:30px 0 0;font:500 17px Archivo,sans-serif">Estado de cada uno</h3>
+  <div class="people">`;
+
+  PEOPLE.forEach(p=>{
+    const pd=M.pays[p].reduce((a,b)=>a+b,0);
+    const falta=Math.max(0,cuota-pd);
+    const pct=cuota>0?Math.min(100,pd/cuota*100):0;
+    const ok=cuota>0&&falta<1;
+    h+=`<div class="person${ok?" ok":""}">
+      <div class="pname">${p}${ok?'<span class="tick">al día</span>':""}</div>
+      <div class="pline">Ha dado <b>${cop(pd)}</b></div>
+      <div class="pline d">Le falta <b>${cop(falta)}</b></div>
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="padd">
+        <input id="in-${p}" placeholder="Abono" inputmode="numeric" autocomplete="off">
+        <button data-pay="${p}">Registrar</button>
+      </div>`;
+    if(M.pays[p].length){
+      h+=`<div class="hist">`+M.pays[p].map((v,i)=>`<span data-un="${p}" data-i="${i}" title="Quitar este abono">${cop(v)}</span>`).join("  ")+`</div>`;
+    }
+    h+=`</div>`;
+  });
+
+  h+=`</div></section>`;
+  money.innerHTML=h;
+}
+
+money.addEventListener("click",e=>{
+  const add=e.target.closest("#badd");
+  if(add){
+    const n=document.getElementById("bn").value.trim();
+    const p=num(document.getElementById("bp").value);
+    if(!n||p<=0)return;
+    M.buys.push({n,p});saveM();renderMoney();return;
+  }
+  const del=e.target.closest("[data-buy]");
+  if(del){M.buys.splice(+del.dataset.buy,1);saveM();renderMoney();return}
+  const pay=e.target.closest("[data-pay]");
+  if(pay){
+    const p=pay.dataset.pay,el=document.getElementById("in-"+p),v=num(el.value);
+    if(v<=0)return;
+    M.pays[p].push(v);saveM();renderMoney();return;
+  }
+  const un=e.target.closest("[data-un]");
+  if(un){M.pays[un.dataset.un].splice(+un.dataset.i,1);saveM();renderMoney();return}
+});
+
+money.addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;
+  if(e.target.id==="bn"||e.target.id==="bp"){document.getElementById("badd").click()}
+  else if(e.target.id&&e.target.id.startsWith("in-")){
+    money.querySelector('[data-pay="'+e.target.id.slice(3)+'"]').click();
+  }
+});
+
+renderMoney();
+build();readout();applyFilter();
+</script>
+</body>
+</html>
