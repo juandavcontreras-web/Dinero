@@ -34,6 +34,11 @@ h1 span{color:var(--rojo)}
 .marcas{display:flex; flex-wrap:wrap; gap:4px; margin:14px 0 4px}
 .marca{width:9px; height:26px; border:1.5px solid var(--rojo-hondo); background:transparent}
 .marca.ok{background:var(--rojo); border-color:var(--rojo)}
+.turno{margin-top:14px; padding-top:12px; border-top:1px dashed var(--linea)}
+.turno-t{font-size:15px}
+.turno-t em{font-style:normal; color:var(--tenue); font-size:13px}
+.turno-t b{font-weight:600}
+.turno-d{font-size:13px; color:var(--tenue); margin:2px 0 8px}
 .estado{font-size:13px; color:var(--tenue); margin-top:8px}
 .estado b{color:var(--crema); font-weight:600}
 button{font-family:var(--texto); font-size:15px; cursor:pointer}
@@ -106,8 +111,8 @@ li{border-bottom:1px solid var(--linea)}
     <details>
       <summary>Reglas y respaldo</summary>
       <p class="reglas">
-        Cada día debes 1 episodio. Si un día no ves nada, al día siguiente debes ese 1 más la cantidad de títulos que estés viendo. Cada día que sigas en cero se suma otra vez esa cantidad. La deuda baja con cada episodio que marques y vuelves a la normalidad cuando la pagas completa.<br><br>
-        El primer día de cada mes entra un título de cada lista. Si terminas todo antes, entra uno nuevo enseguida.
+        Cada día debes 1 episodio. Si un día no cubres lo que debes, al día siguiente se suma lo que quedó faltando más la cantidad de títulos que estés viendo. Eso se repite todos los días, aunque veas algo, hasta el día en que pagues la deuda completa; ahí vuelve a 1 diario.<br><br>
+        Ves 10 episodios de un título y pasas al siguiente. También cambias si se acaba la temporada según los episodios que le hayas cargado; si era la última parte, el título se da por terminado.<br><br>El primer día de cada mes entra un título de cada lista. Si terminas todo antes, entra uno nuevo enseguida.
       </p>
       <button class="btn sec" id="exportar">Descargar copia de respaldo</button>
       <button class="btn sec" id="importar">Cargar una copia</button>
@@ -145,7 +150,7 @@ function semilla(){
     if(x.t){ it.bloques.push({tipo:'Temporada', et:String(x.t), eps:null}); it.prog.b = 0; }
     return it;
   });
-  return { items, deuda:0, hoy:{ fecha:hoyStr(), vistos:0 }, registro:[], ultimoSorteo:mesStr(hoyStr()) };
+  return { items, deuda:0, hoy:{ fecha:hoyStr(), vistos:0 }, registro:[], ultimoSorteo:mesStr(hoyStr()), actual:null };
 }
 function cargar(){
   let raw = null;
@@ -163,8 +168,7 @@ function pasarDias(){
     const v = S.hoy.vistos;
     const N = S.items.filter(i=>i.lista==='viendo').length;
     if(v >= req) S.deuda = 0;
-    else if(v === 0) S.deuda = (S.deuda > 0) ? S.deuda + N : 1 + N;
-    else S.deuda = req - v;
+    else S.deuda = req - v + N;
     S.hoy = { fecha: sumaDia(S.hoy.fecha), vistos: 0 };
   }
   if(S.hoy.fecha > hoy) S.hoy.fecha = hoy;
@@ -192,16 +196,60 @@ function rellenarSiVacio(){
   if(n) aviso = 'Terminaste todo, entra: ' + n;
 }
 
+/* ---------- turno actual ---------- */
+function actual(){
+  const v = enLista('viendo');
+  if(!v.length){ S.actual = null; return null; }
+  let it = v.find(i=>i.id===S.actual);
+  if(!it){ it = v[0]; S.actual = it.id; }
+  return it;
+}
+function avanzarPuntero(desde){
+  const v = enLista('viendo');
+  if(v.length < 2) return;
+  const id = desde ? desde.id : S.actual;
+  const ix = v.findIndex(i=>i.id===id);
+  S.actual = v[(ix + 1) % v.length].id;
+}
+function finDeBloque(it){
+  const b = it.bloques[it.prog.b];
+  if(!b) return null;
+  return b.tipo === 'Temporada' ? (b.eps || null) : 1;
+}
+function proximoCorte(it){
+  const fin = finDeBloque(it);
+  const diez = (Math.floor((it.prog.c || 0) / 10) + 1) * 10;
+  return fin ? Math.min(fin, diez) : diez;
+}
+
 /* ---------- acciones ---------- */
 function verEpisodio(it){
   S.hoy.vistos++;
-  if(it && it.prog) it.prog.c = (it.prog.c || 0) + 1;
+  if(!it){ guardar(); pintar(); return; }
+  it.prog.c = (it.prog.c || 0) + 1;
+  const fin = finDeBloque(it);
+  let cambiar = false;
+  if(fin && it.prog.c >= fin){
+    if(it.prog.b !== null && it.prog.b < it.bloques.length - 1){
+      it.prog.b++; it.prog.c = 0; cambiar = true;
+      aviso = it.n + ': terminaste esa parte, sigue ' + it.bloques[it.prog.b].tipo + ' ' + (it.bloques[it.prog.b].et || '');
+    } else {
+      aviso = it.n + ': terminada, va al registro.';
+      terminar(it); return;
+    }
+  }
+  if(it.prog.c > 0 && it.prog.c % 10 === 0) cambiar = true;
+  if(cambiar) avanzarPuntero(it);
   guardar(); pintar();
 }
 function terminar(it){
+  const v = enLista('viendo');
+  const ix = v.findIndex(i=>i.id===it.id);
+  const sig = v.length > 1 ? v[(ix + 1) % v.length] : null;
   S.registro.unshift({ n: it.n, fecha: hoyStr() });
   S.items = S.items.filter(i=>i.id!==it.id);
-  abierto = null; rellenarSiVacio(); guardar(); pintar();
+  S.actual = sig && sig.id !== it.id ? sig.id : null;
+  abierto = null; rellenarSiVacio(); actual(); guardar(); pintar();
 }
 function borrar(it){
   if(!confirm('¿Eliminar "'+it.n+'" de todas las listas?')) return;
@@ -230,8 +278,26 @@ function pintarHoy(){
   else if(S.deuda>0) est.innerHTML = '<b>En deuda.</b> Debes '+req+' y llevas '+S.hoy.vistos+'.';
   else est.innerHTML = 'Al día. Marca el episodio cuando lo veas.';
   box.append(est);
-  const b = el('button','btn','Vi 1 episodio');
-  b.onclick = () => verEpisodio(null);
+  const act = actual();
+  const turno = el('div','turno');
+  if(act){
+    const b2 = act.bloques[act.prog.b];
+    const linea = el('div','turno-t');
+    linea.append(el('em','','Viendo: '), el('b','', act.n));
+    turno.append(linea);
+    const det = [];
+    if(b2) det.push(b2.tipo + (b2.et ? ' ' + b2.et : ''));
+    det.push(act.prog.c ? 'capítulo ' + act.prog.c : 'sin empezar');
+    turno.append(el('div','turno-d', det.join(', ') + ' · cambias de título en el ' + proximoCorte(act)));
+    const sw = el('button','mini','Cambiar de título');
+    sw.onclick = () => { avanzarPuntero(null); guardar(); pintar(); };
+    turno.append(sw);
+  } else {
+    turno.append(el('div','turno-d','No tienes títulos abiertos.'));
+  }
+  box.append(turno);
+  const b = el('button','btn', act ? 'Vi 1 episodio de ' + act.n : 'Vi 1 episodio');
+  b.onclick = () => verEpisodio(actual());
   box.append(b);
 }
 
@@ -274,7 +340,7 @@ function pintarLista(){
     const li = el('li');
     const r = el('div','reng');
     const nm = el('div','nom');
-    nm.append(el('b','',it.n));
+    nm.append(el('b','', (tab==='viendo' && it.id===S.actual ? '▸ ' : '') + it.n));
     const m = meta(it); if(m) nm.append(el('small','',m));
     nm.onclick = ()=>{ abierto = abierto===it.id ? null : it.id; pintarLista(); };
     const pts = el('button','pts','⋮');
