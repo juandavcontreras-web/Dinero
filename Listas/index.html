@@ -101,7 +101,7 @@ li{border-bottom:1px solid var(--linea)}
   <div id="aviso"></div>
   <section class="hoy" id="hoy"></section>
   <div class="tabs" id="tabs"></div>
-  <div class="buscar"><input id="q" placeholder="Buscar en la lista" autocomplete="off"><button class="mini" id="nuevo">+ Nuevo</button></div>
+  <div class="buscar"><input id="q" placeholder="Buscar en la lista" autocomplete="off"><button class="mini" id="deshacer" style="display:none">↶ Deshacer</button><button class="mini" id="nuevo">+ Nuevo</button></div>
   <ul id="lista"></ul>
   <div class="pie">
     <details>
@@ -141,6 +141,16 @@ function cmp(a,b){
 }
 const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const enLista = l => S.items.filter(i=>i.lista===l).sort(cmp);
+
+/* ---------- deshacer ---------- */
+let historial = [];
+function snap(){ try{ historial.push(JSON.stringify(S)); if(historial.length > 40) historial.shift(); }catch(e){} }
+function deshacer(){
+  if(!historial.length) return;
+  S = JSON.parse(historial.pop());
+  abierto = null; aviso = 'Se deshizo el último cambio.';
+  guardar(); pintar();
+}
 
 /* ---------- guardar y cargar ---------- */
 function guardar(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ alert('No se pudo guardar en este navegador.'); } }
@@ -224,6 +234,7 @@ function proximoCorte(it){
 
 /* ---------- acciones ---------- */
 function verEpisodio(it){
+  snap();
   S.hoy.vistos++;
   if(!it){ guardar(); pintar(); return; }
   it.prog.c = (it.prog.c || 0) + 1;
@@ -235,14 +246,15 @@ function verEpisodio(it){
       aviso = it.n + ': terminaste esa parte, sigue ' + it.bloques[it.prog.b].tipo + ' ' + (it.bloques[it.prog.b].et || '');
     } else {
       aviso = it.n + ': terminada, va al registro.';
-      terminar(it); return;
+      terminar(it, true); return;
     }
   }
   if(it.prog.c > 0 && it.prog.c % 10 === 0) cambiar = true;
   if(cambiar) avanzarPuntero(it);
   guardar(); pintar();
 }
-function terminar(it){
+function terminar(it, sinSnap){
+  if(!sinSnap) snap();
   const v = enLista('viendo');
   const ix = v.findIndex(i=>i.id===it.id);
   const sig = v.length > 1 ? v[(ix + 1) % v.length] : null;
@@ -252,7 +264,8 @@ function terminar(it){
   abierto = null; rellenarSiVacio(); actual(); guardar(); pintar();
 }
 function borrar(it){
-  if(!confirm('¿Eliminar "'+it.n+'" de todas las listas?')) return;
+  if(!confirm('¿Eliminar "'+it.n+'" de todas las listas? Se puede deshacer.')) return;
+  snap();
   S.items = S.items.filter(i=>i.id!==it.id);
   abierto = null; rellenarSiVacio(); guardar(); pintar();
 }
@@ -290,7 +303,7 @@ function pintarHoy(){
     det.push(act.prog.c ? 'capítulo ' + act.prog.c : 'sin empezar');
     turno.append(el('div','turno-d', det.join(', ') + ' · cambias de título en el ' + proximoCorte(act)));
     const sw = el('button','mini','Cambiar de título');
-    sw.onclick = () => { avanzarPuntero(null); guardar(); pintar(); };
+    sw.onclick = () => { snap(); avanzarPuntero(null); guardar(); pintar(); };
     turno.append(sw);
   } else {
     turno.append(el('div','turno-d','No tienes títulos abiertos.'));
@@ -362,9 +375,9 @@ function detalle(it){
     const f = el('div','bloque'+(it.prog.b===ix?' act':''));
     f.append(el('span','', b.tipo + (b.et?' '+b.et:'') + (b.eps?' — '+b.eps+' episodios':'')));
     const marcar = el('button','mini', it.prog.b===ix?'aquí voy':'marcar');
-    marcar.onclick = ()=>{ it.prog.b = ix; guardar(); pintarLista(); };
+    marcar.onclick = ()=>{ snap(); it.prog.b = ix; guardar(); pintarLista(); };
     const quitar = el('button','mini','×');
-    quitar.onclick = ()=>{ it.bloques.splice(ix,1);
+    quitar.onclick = ()=>{ snap(); it.bloques.splice(ix,1);
       if(it.prog.b===ix) it.prog.b=null; else if(it.prog.b>ix) it.prog.b--;
       guardar(); pintarLista(); };
     f.append(marcar, quitar); cont.append(f);
@@ -379,6 +392,7 @@ function detalle(it){
   sel.onchange = ()=>{ eps.style.display = sel.value==='Temporada' ? '' : 'none'; };
   const add = el('button','mini','Agregar a la lista');
   add.onclick = ()=>{
+    snap();
     if(!et.value.trim() && sel.value==='Temporada'){ et.focus(); return; }
     it.bloques.push({ tipo:sel.value, et:et.value.trim(), eps: sel.value==='Temporada' && eps.value ? +eps.value : null });
     if(it.prog.b===null) it.prog.b = it.bloques.length-1;
@@ -391,9 +405,9 @@ function detalle(it){
   const f2 = el('div','form');
   const cap = el('input'); cap.className='med'; cap.type='number'; cap.min='0'; cap.placeholder='Capítulo';
   cap.value = it.prog.c || '';
-  cap.onchange = ()=>{ it.prog.c = cap.value ? +cap.value : null; guardar(); };
+  cap.onchange = ()=>{ snap(); it.prog.c = cap.value ? +cap.value : null; guardar(); };
   const nota = el('input'); nota.className='med'; nota.placeholder='Nota'; nota.value = it.nota||'';
-  nota.onchange = ()=>{ it.nota = nota.value.trim(); guardar(); };
+  nota.onchange = ()=>{ snap(); it.nota = nota.value.trim(); guardar(); };
   f2.append(cap, nota); p.append(f2);
 
   /* acciones */
@@ -402,11 +416,11 @@ function detalle(it){
     const b1 = el('button','','Vi 1 episodio'); b1.onclick = ()=>verEpisodio(it); acc.append(b1);
     const b2 = el('button','','Terminado'); b2.onclick = ()=>terminar(it); acc.append(b2);
   } else {
-    const b1 = el('button','','Pasar a Viendo'); b1.onclick = ()=>{ it.lista='viendo'; guardar(); pintar(); }; acc.append(b1);
+    const b1 = el('button','','Pasar a Viendo'); b1.onclick = ()=>{ snap(); it.lista='viendo'; guardar(); pintar(); }; acc.append(b1);
   }
   const mv = el('select');
   LISTAS.forEach(([k,nom])=>{ const o=el('option','','Mover a: '+nom); o.value=k; if(k===it.lista) o.selected=true; mv.append(o); });
-  mv.onchange = ()=>{ it.lista = mv.value; abierto=null; rellenarSiVacio(); guardar(); pintar(); };
+  mv.onchange = ()=>{ snap(); it.lista = mv.value; abierto=null; rellenarSiVacio(); guardar(); pintar(); };
   const del = el('button','peligro','Eliminar'); del.onclick = ()=>borrar(it);
   acc.append(del); p.append(acc); p.append(mv);
   return p;
@@ -418,13 +432,18 @@ function pintarRegistro(){
   S.registro.forEach(r=> ol.append(el('li','', r.n + ' — ' + r.fecha)));
 }
 
-function pintar(){ pintarAviso(); pintarHoy(); pintarTabs(); pintarLista(); pintarRegistro(); }
+function pintar(){
+  const d = document.getElementById('deshacer');
+  if(d) d.style.display = historial.length ? '' : 'none';
+  pintarAviso(); pintarHoy(); pintarTabs(); pintarLista(); pintarRegistro(); }
 
 /* ---------- pie ---------- */
 document.getElementById('q').addEventListener('input', pintarLista);
+document.getElementById('deshacer').onclick = deshacer;
 document.getElementById('nuevo').onclick = ()=>{
   const n = prompt('Nombre del título nuevo:');
   if(!n || !n.trim()) return;
+  snap();
   S.items.push({ id:uid(), n:n.trim(), lista:tab, nota:'', bloques:[], prog:{b:null,c:null} });
   guardar(); pintarLista(); pintarTabs();
 };
