@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#120E0F">
+<title>Un episodio al día</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Karla:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#120E0F; --panel:#1B1517; --panel2:#241C1F; --linea:#332A2D;
+  --rojo:#D42433; --rojo-hondo:#7E1019; --crema:#F2EBE6; --tenue:#95868A;
+  --display:'Anton', Impact, sans-serif;
+  --texto:'Karla', system-ui, -apple-system, sans-serif;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0; background:var(--tinta); color:var(--crema); font-family:var(--texto);
+  font-size:16px; line-height:1.45; padding:0 0 64px; }
+.wrap{max-width:620px; margin:0 auto; padding:0 16px}
+h1{font-family:var(--display); font-weight:400; font-size:30px; letter-spacing:.02em;
+  margin:22px 0 2px; line-height:1}
+h1 span{color:var(--rojo)}
+.sub{color:var(--tenue); font-size:13px; margin:0 0 18px}
+
+/* ---------- hoy ---------- */
+.hoy{background:var(--panel); border:1px solid var(--linea); border-top:3px solid var(--rojo);
+  padding:16px; margin-bottom:14px}
+.hoy .fila{display:flex; align-items:baseline; gap:12px}
+.cifra{font-family:var(--display); font-size:64px; line-height:.85; color:var(--crema)}
+.cifra.deuda{color:var(--rojo)}
+.cifra-lbl{font-size:14px; color:var(--tenue)}
+.marcas{display:flex; flex-wrap:wrap; gap:4px; margin:14px 0 4px}
+.marca{width:9px; height:26px; border:1.5px solid var(--rojo-hondo); background:transparent}
+.marca.ok{background:var(--rojo); border-color:var(--rojo)}
+.estado{font-size:13px; color:var(--tenue); margin-top:8px}
+.estado b{color:var(--crema); font-weight:600}
+button{font-family:var(--texto); font-size:15px; cursor:pointer}
+.btn{display:block; width:100%; margin-top:14px; padding:13px; background:var(--rojo);
+  color:#fff; border:0; font-weight:600; letter-spacing:.02em}
+.btn:active{background:var(--rojo-hondo)}
+.btn.sec{background:transparent; color:var(--crema); border:1px solid var(--linea)}
+.mini{background:transparent; border:1px solid var(--linea); color:var(--tenue);
+  padding:5px 10px; font-size:13px}
+.mini:active{color:var(--crema)}
+
+.aviso{background:var(--rojo-hondo); color:#fff; padding:12px 14px; font-size:14px; margin-bottom:14px}
+.aviso button{float:right; background:none; border:0; color:#fff; font-size:18px; line-height:1; padding:0 0 0 10px}
+
+/* ---------- pestañas ---------- */
+.tabs{display:flex; gap:0; border-bottom:1px solid var(--linea); margin-bottom:10px; overflow-x:auto}
+.tab{flex:0 0 auto; background:none; border:0; border-bottom:2px solid transparent; color:var(--tenue);
+  padding:10px 12px; font-size:14px}
+.tab.on{color:var(--crema); border-bottom-color:var(--rojo)}
+.tab i{font-style:normal; font-size:12px; color:var(--tenue); margin-left:4px}
+.buscar{display:flex; gap:8px; margin-bottom:10px}
+input,select{font-family:var(--texto); font-size:15px; background:var(--panel2); color:var(--crema);
+  border:1px solid var(--linea); padding:9px 10px; width:100%}
+input:focus,select:focus{outline:2px solid var(--rojo); outline-offset:-2px}
+
+/* ---------- lista ---------- */
+ul{list-style:none; margin:0; padding:0}
+li{border-bottom:1px solid var(--linea)}
+.reng{display:flex; align-items:center; gap:10px; padding:11px 2px}
+.nom{flex:1; min-width:0}
+.nom b{font-weight:600; font-size:15px; display:block; overflow-wrap:anywhere}
+.nom small{color:var(--tenue); font-size:12.5px}
+.pts{background:none; border:0; color:var(--tenue); font-size:20px; padding:4px 8px; line-height:1}
+.panelx{background:var(--panel); border:1px solid var(--linea); padding:14px; margin:0 0 12px}
+.panelx h4{margin:0 0 8px; font-size:12px; letter-spacing:.08em; color:var(--tenue); font-weight:600}
+.bloques{margin:0 0 12px}
+.bloque{display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px dashed var(--linea); font-size:14px}
+.bloque span{flex:1}
+.bloque.act{color:var(--rojo)}
+.form{display:flex; gap:8px; flex-wrap:wrap}
+.form>*{flex:1 1 100%}
+.form .med{flex:1 1 calc(50% - 4px)}
+.acc{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px}
+.acc button{flex:1 1 calc(50% - 4px); padding:10px; background:transparent; border:1px solid var(--linea); color:var(--crema)}
+.acc .peligro{color:var(--rojo); border-color:var(--rojo-hondo)}
+.vacio{color:var(--tenue); font-size:14px; padding:18px 0; text-align:center}
+
+/* ---------- pie ---------- */
+.pie{margin-top:26px; border-top:1px solid var(--linea); padding-top:14px}
+.pie summary{color:var(--tenue); font-size:13px; cursor:pointer; padding:8px 0}
+.pie ol{color:var(--tenue); font-size:13.5px; padding-left:20px; margin:4px 0 10px}
+.pie li{border:0; padding:3px 0}
+.reglas{color:var(--tenue); font-size:13px; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Un episodio <span>al día</span></h1>
+  <p class="sub">Si no ves, la deuda crece con el número de títulos que tengas abiertos.</p>
+  <div id="aviso"></div>
+  <section class="hoy" id="hoy"></section>
+  <div class="tabs" id="tabs"></div>
+  <div class="buscar"><input id="q" placeholder="Buscar en la lista" autocomplete="off"><button class="mini" id="nuevo">+ Nuevo</button></div>
+  <ul id="lista"></ul>
+  <div class="pie">
+    <details>
+      <summary>Registro de lo terminado (<span id="nreg">0</span>)</summary>
+      <ol id="registro"></ol>
+    </details>
+    <details>
+      <summary>Reglas y respaldo</summary>
+      <p class="reglas">
+        Cada día debes 1 episodio. Si un día no ves nada, al día siguiente debes ese 1 más la cantidad de títulos que estés viendo. Cada día que sigas en cero se suma otra vez esa cantidad. La deuda baja con cada episodio que marques y vuelves a la normalidad cuando la pagas completa.<br><br>
+        El primer día de cada mes entra un título de cada lista. Si terminas todo antes, entra uno nuevo enseguida.
+      </p>
+      <button class="btn sec" id="exportar">Descargar copia de respaldo</button>
+      <button class="btn sec" id="importar">Cargar una copia</button>
+      <input type="file" id="archivo" accept="application/json" style="display:none">
+    </details>
+  </div>
+</div>
+<script>
+const SEED =
+[{"n":"Ip man. The legend is born","lista":"viendo"},{"n":"Prison Break","lista":"viendo","nota":"T3","t":1,"c":10},{"n":"The white lotus","lista":"viendo"},{"n":"365 días","lista":"vistas"},{"n":"After","lista":"vistas"},{"n":"Anaconda 2025","lista":"vistas"},{"n":"Alice in Borderland","lista":"vistas","t":2},{"n":"Alquimia de Almas","lista":"vistas","nota":"ver resumen de T1","t":2},{"n":"American horror story","lista":"vistas","t":1,"c":6},{"n":"Avatar","lista":"vistas"},{"n":"Better call saul","lista":"vistas"},{"n":"Blac clover","lista":"vistas","t":2},{"n":"Black Mirror","lista":"vistas","t":6},{"n":"Bleach continuacion","lista":"vistas"},{"n":"Blue Lock","lista":"vistas","c":2},{"n":"Boruto: Next Generations","lista":"vistas"},{"n":"Chainsaw man","lista":"vistas","t":2},{"n":"Cien años de soledad","lista":"vistas","t":1,"c":5},{"n":"Code geass","lista":"vistas"},{"n":"Culpa nuestra","lista":"vistas"},{"n":"Demon slayer. Pelicula 2/3","lista":"vistas"},{"n":"Dragon ball super: saga de moro","lista":"vistas"},{"n":"Dr stone","lista":"vistas","t":4,"c":30},{"n":"Duna part II","lista":"vistas"},{"n":"El caballero de los 7 reinos","lista":"vistas"},{"n":"El cuento de la criada","lista":"vistas","t":2},{"n":"Élite","lista":"vistas","nota":"última temporada"},{"n":"El señor de los Cielos","lista":"vistas","t":2,"c":6},{"n":"Esta bien no estar bien","lista":"vistas","c":3},{"n":"Euphoria","lista":"vistas"},{"n":"Fire force","lista":"vistas"},{"n":"Frieren","lista":"vistas","t":1,"c":10},{"n":"From","lista":"vistas","t":5},{"n":"Gatchiakuta","lista":"vistas","c":4},{"n":"Gintama","lista":"vistas","t":1,"c":30},{"n":"House of dragon","lista":"vistas","t":2},{"n":"Into de dark","lista":"vistas","t":2,"c":1},{"n":"Jojos bizarred adventure","lista":"vistas"},{"n":"La sustancia","lista":"vistas"},{"n":"Los 100","lista":"vistas","nota":"Resumen Youtube"},{"n":"Los Bridgerton","lista":"vistas","t":2},{"n":"Los Simpsons","lista":"vistas","t":6},{"n":"Lost","lista":"vistas","t":2,"c":19},{"n":"Lucifer","lista":"vistas","nota":"Continuacion"},{"n":"Manifiesto (serie)","lista":"vistas","t":3},{"n":"Marvel","lista":"vistas"},{"n":"Mashle","lista":"vistas","nota":"Ver resumenes 1 y 2","t":3},{"n":"Monster","lista":"vistas","nota":"NAPIA","c":11},{"n":"One Piece","lista":"vistas","nota":"NAPIA","c":928},{"n":"One Piece Live Action","lista":"vistas"},{"n":"One Punch Man","lista":"vistas","t":3},{"n":"Peaky Blinders","lista":"vistas","c":3},{"n":"Private practice","lista":"vistas","nota":"Universo Grey's Anatomy >5","t":1},{"n":"Ranking of kings","lista":"vistas","c":1},{"n":"Record of ragnarok","lista":"vistas","t":3},{"n":"Rent a girlfriend","lista":"vistas"},{"n":"Re:zero","lista":"vistas","nota":"Ver resumen de las 3 T anteriores","t":4},{"n":"Riverdale","lista":"vistas"},{"n":"Smile","lista":"vistas"},{"n":"Solo leveling","lista":"vistas","t":3},{"n":"Stranger things T5 P2","lista":"vistas","nota":"a partir del 5; Stranger Things: Relatos del 85"},{"n":"The Chosen","lista":"vistas","t":2},{"n":"The last of us Part II","lista":"vistas"},{"n":"The Walking Dead (2010-2022)","lista":"vistas","t":9,"c":10},{"n":"Tokyo revengers","lista":"vistas","t":4},{"n":"Tres caines","lista":"vistas","c":9},{"n":"True Detective","lista":"vistas","t":2},{"n":"Twin peaks","lista":"vistas","nota":"fire walk with me. Pelicula"},{"n":"Una familia normal","lista":"vistas"},{"n":"Un amor predestinado","lista":"vistas","t":1,"c":10},{"n":"White Collar","lista":"vistas"},{"n":"You","lista":"vistas","t":1,"c":2},{"n":"12 años de esclavitud","lista":"porver"},{"n":"18 regalos","lista":"porver"},{"n":"Agents of the Four Seasons","lista":"porver"},{"n":"Aguas profundas","lista":"porver"},{"n":"Aires de esperanza","lista":"porver"},{"n":"Akame ga kill","lista":"porver"},{"n":"Alice: Subservience","lista":"porver"},{"n":"Andor","lista":"porver"},{"n":"Amor a primera vista","lista":"porver"},{"n":"Amor Redentor","lista":"porver"},{"n":"Amityville","lista":"porver"},{"n":"Backrooms","lista":"porver"},{"n":"Castle rock","lista":"porver"},{"n":"Chapelwaite","lista":"porver"},{"n":"¿Conoces a Joe Black?","lista":"porver"},{"n":"Creed","lista":"porver"},{"n":"Crimen perfecto","lista":"porver"},{"n":"Dandadan","lista":"porver"},{"n":"Depredador tierras salvajes","lista":"porver"},{"n":"Dream Lover","lista":"porver"},{"n":"El gran diluvio","lista":"porver"},{"n":"El justiciero","lista":"porver"},{"n":"El lado dulce de la traicion","lista":"porver"},{"n":"El secreto Atrevete a soñar","lista":"porver"},{"n":"Estado de fuga 1986","lista":"porver"},{"n":"Eyes wide shut","lista":"porver"},{"n":"Fatalidad a tu servicio","lista":"porver"},{"n":"FLCL","lista":"porver"},{"n":"Fool Night","lista":"porver"},{"n":"Godzilla y kong","lista":"porver","nota":"monsterverse"},{"n":"Good Doctor","lista":"porver"},{"n":"Go-Tōbun no Hanayome","lista":"porver"},{"n":"Hasta el final","lista":"porver"},{"n":"Hannibal","lista":"porver"},{"n":"Harry potter","lista":"porver","nota":"Serie"},{"n":"Hell paradise","lista":"porver"},{"n":"Her","lista":"porver"},{"n":"Hereditary","lista":"porver"},{"n":"Hereje","lista":"porver"},{"n":"Hope","lista":"porver"},{"n":"House","lista":"porver"},{"n":"Infiel","lista":"porver","nota":"2024"},{"n":"Invencible","lista":"porver"},{"n":"Jigokuraku","lista":"porver"},{"n":"Kaguya sama","lista":"porver"},{"n":"Kakegurui","lista":"porver"},{"n":"Kill blue","lista":"porver"},{"n":"Kuroshitsuji","lista":"porver"},{"n":"Ladman: un negocio crudo","lista":"porver"},{"n":"La ballena","lista":"porver","nota":"Pelicula"},{"n":"La cara oculta","lista":"porver"},{"n":"My Sister's Keeper","lista":"porver"},{"n":"La forma del agua","lista":"porver"},{"n":"La huésped","lista":"porver"},{"n":"La ley y el orden","lista":"porver"},{"n":"La maldición de Widow's Bay","lista":"porver"},{"n":"La Mano que Mece la Cuna","lista":"porver"},{"n":"La mujer dormida","lista":"porver"},{"n":"La Odisea","lista":"porver"},{"n":"La quinta ola","lista":"porver"},{"n":"La tumba de las luciérnagas","lista":"porver"},{"n":"Leviticus","lista":"porver"},{"n":"Longlegs","lista":"porver"},{"n":"Los extraños","lista":"porver"},{"n":"Los juegos del hambre","lista":"porver"},{"n":"Los retornados","lista":"porver"},{"n":"Love alarm","lista":"porver"},{"n":"Love and other drugs","lista":"porver"},{"n":"Malèna","lista":"porver"},{"n":"Maligno","lista":"porver"},{"n":"Marley y yo","lista":"porver"},{"n":"Marriagetoxin","lista":"porver"},{"n":"Merlina","lista":"porver"},{"n":"Michael","lista":"porver","nota":"Pelicula"},{"n":"Mientras el lobo no está","lista":"porver"},{"n":"Modern love","lista":"porver"},{"n":"Monarch: el legado de los monstruos","lista":"porver"},{"n":"Monstruo: La historia de Ed Gein","lista":"porver"},{"n":"Moonfall","lista":"porver","nota":"2022"},{"n":"Moushoku tensei","lista":"porver"},{"n":"Nippon Sangoku","lista":"porver"},{"n":"Noche infernal","lista":"porver"},{"n":"No hables con los extraños","lista":"porver"},{"n":"No miren arriba","lista":"porver"},{"n":"Noragami","lista":"porver"},{"n":"No respires","lista":"porver"},{"n":"Obsesion secreta","lista":"porver"},{"n":"Odisea. Pelicula 2026","lista":"porver"},{"n":"Oppenheimer","lista":"porver"},{"n":"Pablo Escobar","lista":"porver"},{"n":"Perfume: la historia de un asesino","lista":"porver"},{"n":"Pesadilla en el infierno","lista":"porver"},{"n":"Plunderer","lista":"porver"},{"n":"Pobres criaturas","lista":"porver"},{"n":"Proyecto Salvación","lista":"porver"},{"n":"Rooster Fighter","lista":"porver"},{"n":"Run","lista":"porver","nota":"2020"},{"n":"Sabuesos","lista":"porver","nota":"Kdrama"},{"n":"Sakamoto days","lista":"porver"},{"n":"Saltburn","lista":"porver"},{"n":"Samurai X","lista":"porver"},{"n":"Secretary","lista":"porver"},{"n":"Secretos íntimos","lista":"porver"},{"n":"Sentenced to Be a Hero","lista":"porver"},{"n":"Shame","lista":"porver"},{"n":"Sinister","lista":"porver"},{"n":"Sinners","lista":"porver"},{"n":"Sons of anarchy","lista":"porver"},{"n":"Star wars","lista":"porver"},{"n":"Succession","lista":"porver"},{"n":"Susurros mortales","lista":"porver"},{"n":"Takopi no Genzai","lista":"porver"},{"n":"The Art of Sarah","lista":"porver"},{"n":"The babysitters","lista":"porver"},{"n":"The beauty","lista":"porver"},{"n":"The carpinter's son","lista":"porver"},{"n":"The dark and the wicked","lista":"porver"},{"n":"The lodge","lista":"porver"},{"n":"The punisher","lista":"porver"},{"n":"The Voyeurs","lista":"porver"},{"n":"Una pasión oculta","lista":"porver"},{"n":"Un don excepcional","lista":"porver"},{"n":"Un monstruo viene a verme","lista":"porver"},{"n":"Vamos pa' eso PODCAST","lista":"porver"},{"n":"wild things","lista":"porver"},{"n":"Witch hat atelier","lista":"porver"},{"n":"Yellowjackets","lista":"porver"},{"n":"Yomi no Tsugai","lista":"porver"},{"n":"You Should Have Left","lista":"porver"},{"n":"2521","lista":"recom"},{"n":"Akame ga kill","lista":"recom"},{"n":"Amy la chica detrás del nombre","lista":"recom"},{"n":"Anatomy of a fall","lista":"recom"},{"n":"Angel beats!","lista":"recom"},{"n":"Anohana","lista":"recom"},{"n":"Arcane","lista":"recom"},{"n":"Avatar: fuego y cenizas","lista":"recom"},{"n":"Bajo la misma estrella","lista":"recom"},{"n":"Baby girl","lista":"recom"},{"n":"Barbie","lista":"recom"},{"n":"Batlestar galáctica","lista":"recom"},{"n":"Beef","lista":"recom"},{"n":"Belleza verdadera","lista":"recom"},{"n":"Big little lies","lista":"recom"},{"n":"Brand new cherry flavor","lista":"recom"},{"n":"Bugonia","lista":"recom"},{"n":"Carol y el fin del mundo","lista":"recom"},{"n":"Chernobyl","lista":"recom"},{"n":"Devilman crybaby","lista":"recom"},{"n":"Dexter","lista":"recom"},{"n":"Dorohedoro","lista":"recom"},{"n":"El amor es como el chachacha","lista":"recom"},{"n":"El club de la media noche","lista":"recom"},{"n":"El instituto","lista":"recom"},{"n":"Elfen lied","lista":"recom"},{"n":"El niño y la garza","lista":"recom"},{"n":"El oso","lista":"recom"},{"n":"El pinguino","lista":"recom","nota":"Ver primero The Batman (2022) — la de Robert Pattinson"},{"n":"El silencio de los inocentes","lista":"recom"},{"n":"Escenas de un matrimonio","lista":"recom"},{"n":"Estamos muertos","lista":"recom"},{"n":"Fatalidad a tu servicio","lista":"recom"},{"n":"Fury","lista":"recom"},{"n":"Hazbin hotel","lista":"recom"},{"n":"Hola y adios mama","lista":"recom"},{"n":"Huesera","lista":"recom"},{"n":"Isla siniestra","lista":"recom"},{"n":"Kaiji","lista":"recom"},{"n":"Kinds of kindness","lista":"recom"},{"n":"Klaus","lista":"recom"},{"n":"K-pop demon hunter","lista":"recom"},{"n":"La buena mala madre","lista":"recom"},{"n":"La cabaña","lista":"recom"},{"n":"La caída de la Casa Usher","lista":"recom"},{"n":"La chica de la aguja","lista":"recom"},{"n":"La llave maestra","lista":"recom"},{"n":"La maldicion de Hill house","lista":"recom"},{"n":"La maldicion de bly mannor","lista":"recom"},{"n":"La reina de las lagrimas","lista":"recom"},{"n":"Los renglones torcidos de Dios","lista":"recom"},{"n":"Los ríos de color púrpura","lista":"recom"},{"n":"Mare of Easttown","lista":"recom"},{"n":"Memorias de un caracol","lista":"recom"},{"n":"Mi adorable demonio","lista":"recom"},{"n":"Migi to Dali","lista":"recom"},{"n":"Misa de medianoche","lista":"recom"},{"n":"Moon lovers","lista":"recom"},{"n":"Mouse","lista":"recom"},{"n":"Mr robot","lista":"recom"},{"n":"Nadie nos va a extrañar","lista":"recom"},{"n":"Noragami","lista":"recom"},{"n":"Normal people","lista":"recom"},{"n":"Nosferatu","lista":"recom"},{"n":"Nos vemos en mi 19a vida","lista":"recom"},{"n":"Oppenheimer","lista":"recom"},{"n":"Orb the movement of earth","lista":"recom"},{"n":"Owari no Seraph","lista":"recom"},{"n":"Percy Jackson y los dioses del Olimpo","lista":"recom"},{"n":"Planeta azul","lista":"recom","nota":"Documental"},{"n":"Planeta tierra","lista":"recom","nota":"Documental"},{"n":"Plunderer","lista":"recom"},{"n":"Poor things","lista":"recom"},{"n":"Propuesta laboral","lista":"recom"},{"n":"Reina de lagrimas","lista":"recom"},{"n":"Río Místico","lista":"recom"},{"n":"Se7en: los siete pecados capitales","lista":"recom"},{"n":"Samurai champloo","lista":"recom"},{"n":"Sanctum","lista":"recom"},{"n":"Severance","lista":"recom"},{"n":"Sherlock","lista":"recom"},{"n":"Shogun","lista":"recom"},{"n":"Si la vida te da mandarinas","lista":"recom"},{"n":"Six feet under","lista":"recom"},{"n":"Snowdrop","lista":"recom"},{"n":"Soy franquelda","lista":"recom"},{"n":"Suits","lista":"recom"},{"n":"Suzume","lista":"recom"},{"n":"Talk to me","lista":"recom"},{"n":"Tensei Shitara Slime Datta Ken","lista":"recom"},{"n":"The boys","lista":"recom"},{"n":"The cursed","lista":"recom"},{"n":"The devils doorway","lista":"recom"},{"n":"The empty man","lista":"recom"},{"n":"The Lighthouse","lista":"recom"},{"n":"The Northman","lista":"recom"},{"n":"The Office","lista":"recom"},{"n":"The pitt","lista":"recom"},{"n":"The reader","lista":"recom"},{"n":"The sopranos","lista":"recom"},{"n":"The wire","lista":"recom"},{"n":"The witch","lista":"recom"},{"n":"Tomorrow","lista":"recom"},{"n":"Under the Banner of Heaven","lista":"recom"},{"n":"Vengeance","lista":"recom"},{"n":"Vigilante","lista":"recom"},{"n":"Violet evergarden","lista":"recom"}];
+
+const KEY = 'seriesv1';
+const LISTAS = [['viendo','Viendo'],['vistas','Vistas'],['porver','Por ver'],['recom','Recomendaciones']];
+let S = null, tab = 'viendo', abierto = null, aviso = '';
+
+/* ---------- utilidades ---------- */
+const hoyStr = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const mesStr = s => s.slice(0,7);
+const sumaDia = s => { const d=new Date(s+'T12:00:00'); d.setDate(d.getDate()+1); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const uid = () => Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+function cmp(a,b){
+  const na=a.n.match(/^(\d+)/), nb=b.n.match(/^(\d+)/);
+  if(na&&nb) return (+na[1])-(+nb[1]) || a.n.localeCompare(b.n,'es',{sensitivity:'base'});
+  if(na) return -1; if(nb) return 1;
+  return a.n.localeCompare(b.n,'es',{sensitivity:'base'});
+}
+const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const enLista = l => S.items.filter(i=>i.lista===l).sort(cmp);
+
+/* ---------- guardar y cargar ---------- */
+function guardar(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ alert('No se pudo guardar en este navegador.'); } }
+function semilla(){
+  const items = SEED.map(x=>{
+    const it = { id:uid(), n:x.n, lista:x.lista, nota:x.nota||'', bloques:[], prog:{b:null,c:x.c||null} };
+    if(x.t){ it.bloques.push({tipo:'Temporada', et:String(x.t), eps:null}); it.prog.b = 0; }
+    return it;
+  });
+  return { items, deuda:0, hoy:{ fecha:hoyStr(), vistos:0 }, registro:[], ultimoSorteo:mesStr(hoyStr()) };
+}
+function cargar(){
+  let raw = null;
+  try{ raw = localStorage.getItem(KEY); }catch(e){}
+  S = raw ? JSON.parse(raw) : semilla();
+  if(!S.items) S = semilla();
+}
+
+/* ---------- motor de días ---------- */
+function pasarDias(){
+  const hoy = hoyStr();
+  let guard = 0;
+  while(S.hoy.fecha < hoy && guard++ < 4000){
+    const req = S.deuda > 0 ? S.deuda : 1;
+    const v = S.hoy.vistos;
+    const N = S.items.filter(i=>i.lista==='viendo').length;
+    if(v >= req) S.deuda = 0;
+    else if(v === 0) S.deuda = (S.deuda > 0) ? S.deuda + N : 1 + N;
+    else S.deuda = req - v;
+    S.hoy = { fecha: sumaDia(S.hoy.fecha), vistos: 0 };
+  }
+  if(S.hoy.fecha > hoy) S.hoy.fecha = hoy;
+  if(S.ultimoSorteo !== mesStr(hoy)) sorteoDelMes();
+}
+
+/* ---------- sorteos ---------- */
+function sacarUno(lista){
+  const pool = S.items.filter(i=>i.lista===lista);
+  if(!pool.length) return null;
+  const it = pool[Math.floor(Math.random()*pool.length)];
+  it.lista = 'viendo';
+  return it.n;
+}
+function sorteoDelMes(){
+  const salieron = ['recom','vistas','porver'].map(sacarUno).filter(Boolean);
+  S.ultimoSorteo = mesStr(hoyStr());
+  if(salieron.length) aviso = 'Sorteo del mes: ' + salieron.join(' · ');
+}
+function rellenarSiVacio(){
+  if(S.items.some(i=>i.lista==='viendo')) return;
+  const pools = ['recom','vistas','porver'].filter(l=>S.items.some(i=>i.lista===l));
+  if(!pools.length) return;
+  const n = sacarUno(pools[Math.floor(Math.random()*pools.length)]);
+  if(n) aviso = 'Terminaste todo, entra: ' + n;
+}
+
+/* ---------- acciones ---------- */
+function verEpisodio(it){
+  S.hoy.vistos++;
+  if(it && it.prog) it.prog.c = (it.prog.c || 0) + 1;
+  guardar(); pintar();
+}
+function terminar(it){
+  S.registro.unshift({ n: it.n, fecha: hoyStr() });
+  S.items = S.items.filter(i=>i.id!==it.id);
+  abierto = null; rellenarSiVacio(); guardar(); pintar();
+}
+function borrar(it){
+  if(!confirm('¿Eliminar "'+it.n+'" de todas las listas?')) return;
+  S.items = S.items.filter(i=>i.id!==it.id);
+  abierto = null; rellenarSiVacio(); guardar(); pintar();
+}
+
+/* ---------- pintar ---------- */
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!==undefined) e.textContent=txt; return e; }
+
+function pintarHoy(){
+  const box = document.getElementById('hoy'); box.innerHTML='';
+  const req = S.deuda > 0 ? S.deuda : 1;
+  const faltan = Math.max(0, req - S.hoy.vistos);
+  const fila = el('div','fila');
+  const cif = el('div','cifra'+(S.deuda>0?' deuda':''), String(faltan));
+  fila.append(cif, el('div','cifra-lbl', faltan===1 ? 'episodio pendiente hoy' : 'episodios pendientes hoy'));
+  box.append(fila);
+  const marcas = el('div','marcas');
+  const tope = Math.min(req, 24);
+  for(let i=0;i<tope;i++){ const m=el('div','marca'+(i<S.hoy.vistos?' ok':'')); marcas.append(m); }
+  if(req>24) marcas.append(el('div','cifra-lbl','+'+(req-24)));
+  box.append(marcas);
+  const est = el('div','estado');
+  if(faltan===0) est.innerHTML = '<b>Día cumplido.</b> Vistos hoy: '+S.hoy.vistos+'.';
+  else if(S.deuda>0) est.innerHTML = '<b>En deuda.</b> Debes '+req+' y llevas '+S.hoy.vistos+'.';
+  else est.innerHTML = 'Al día. Marca el episodio cuando lo veas.';
+  box.append(est);
+  const b = el('button','btn','Vi 1 episodio');
+  b.onclick = () => verEpisodio(null);
+  box.append(b);
+}
+
+function pintarAviso(){
+  const c = document.getElementById('aviso'); c.innerHTML='';
+  if(!aviso) return;
+  const d = el('div','aviso'); d.append(el('span','',aviso));
+  const x = el('button','','×'); x.onclick=()=>{ aviso=''; pintarAviso(); };
+  d.append(x); c.append(d);
+}
+
+function pintarTabs(){
+  const c = document.getElementById('tabs'); c.innerHTML='';
+  LISTAS.forEach(([k,nom])=>{
+    const b = el('button','tab'+(tab===k?' on':''), nom);
+    const i = el('i','', ' '+S.items.filter(x=>x.lista===k).length);
+    b.append(i);
+    b.onclick = ()=>{ tab=k; abierto=null; pintarTabs(); pintarLista(); };
+    c.append(b);
+  });
+}
+
+function meta(it){
+  const p = [];
+  if(it.prog.b !== null && it.bloques[it.prog.b]){
+    const b = it.bloques[it.prog.b];
+    p.push(b.tipo + (b.et ? ' ' + b.et : '') + (b.eps ? ' (de ' + b.eps + ')' : ''));
+  }
+  if(it.prog.c) p.push('Cap. ' + it.prog.c);
+  if(it.nota) p.push(it.nota);
+  return p.join(' · ');
+}
+
+function pintarLista(){
+  const ul = document.getElementById('lista'); ul.innerHTML='';
+  const q = norm(document.getElementById('q').value.trim());
+  const arr = enLista(tab).filter(i=> !q || norm(i.n).includes(q));
+  if(!arr.length){ ul.append(el('li','vacio', q ? 'Nada con ese nombre.' : 'Lista vacía.')); return; }
+  arr.forEach(it=>{
+    const li = el('li');
+    const r = el('div','reng');
+    const nm = el('div','nom');
+    nm.append(el('b','',it.n));
+    const m = meta(it); if(m) nm.append(el('small','',m));
+    nm.onclick = ()=>{ abierto = abierto===it.id ? null : it.id; pintarLista(); };
+    const pts = el('button','pts','⋮');
+    pts.onclick = ()=>{ abierto = abierto===it.id ? null : it.id; pintarLista(); };
+    r.append(nm, pts); li.append(r);
+    if(abierto===it.id) li.append(detalle(it));
+    ul.append(li);
+  });
+}
+
+function detalle(it){
+  const p = el('div','panelx');
+
+  /* bloques */
+  p.append(el('h4','','CONTENIDO EN ORDEN'));
+  const cont = el('div','bloques');
+  if(!it.bloques.length) cont.append(el('div','vacio','Sin temporadas ni películas agregadas.'));
+  it.bloques.forEach((b,ix)=>{
+    const f = el('div','bloque'+(it.prog.b===ix?' act':''));
+    f.append(el('span','', b.tipo + (b.et?' '+b.et:'') + (b.eps?' — '+b.eps+' episodios':'')));
+    const marcar = el('button','mini', it.prog.b===ix?'aquí voy':'marcar');
+    marcar.onclick = ()=>{ it.prog.b = ix; guardar(); pintarLista(); };
+    const quitar = el('button','mini','×');
+    quitar.onclick = ()=>{ it.bloques.splice(ix,1);
+      if(it.prog.b===ix) it.prog.b=null; else if(it.prog.b>ix) it.prog.b--;
+      guardar(); pintarLista(); };
+    f.append(marcar, quitar); cont.append(f);
+  });
+  p.append(cont);
+
+  /* agregar bloque */
+  const form = el('div','form');
+  const sel = el('select'); ['Temporada','Película','Otro'].forEach(t=>{ const o=el('option','',t); o.value=t; sel.append(o); });
+  const et = el('input'); et.className='med'; et.placeholder='Cuál (1, 2, nombre…)';
+  const eps = el('input'); eps.className='med'; eps.type='number'; eps.min='1'; eps.placeholder='N.º de episodios';
+  sel.onchange = ()=>{ eps.style.display = sel.value==='Temporada' ? '' : 'none'; };
+  const add = el('button','mini','Agregar a la lista');
+  add.onclick = ()=>{
+    if(!et.value.trim() && sel.value==='Temporada'){ et.focus(); return; }
+    it.bloques.push({ tipo:sel.value, et:et.value.trim(), eps: sel.value==='Temporada' && eps.value ? +eps.value : null });
+    if(it.prog.b===null) it.prog.b = it.bloques.length-1;
+    guardar(); pintarLista();
+  };
+  form.append(sel, et, eps, add); p.append(form);
+
+  /* capítulo actual y nota */
+  p.append(el('h4','','DÓNDE VOY'));
+  const f2 = el('div','form');
+  const cap = el('input'); cap.className='med'; cap.type='number'; cap.min='0'; cap.placeholder='Capítulo';
+  cap.value = it.prog.c || '';
+  cap.onchange = ()=>{ it.prog.c = cap.value ? +cap.value : null; guardar(); };
+  const nota = el('input'); nota.className='med'; nota.placeholder='Nota'; nota.value = it.nota||'';
+  nota.onchange = ()=>{ it.nota = nota.value.trim(); guardar(); };
+  f2.append(cap, nota); p.append(f2);
+
+  /* acciones */
+  const acc = el('div','acc');
+  if(it.lista==='viendo'){
+    const b1 = el('button','','Vi 1 episodio'); b1.onclick = ()=>verEpisodio(it); acc.append(b1);
+    const b2 = el('button','','Terminado'); b2.onclick = ()=>terminar(it); acc.append(b2);
+  } else {
+    const b1 = el('button','','Pasar a Viendo'); b1.onclick = ()=>{ it.lista='viendo'; guardar(); pintar(); }; acc.append(b1);
+  }
+  const mv = el('select');
+  LISTAS.forEach(([k,nom])=>{ const o=el('option','','Mover a: '+nom); o.value=k; if(k===it.lista) o.selected=true; mv.append(o); });
+  mv.onchange = ()=>{ it.lista = mv.value; abierto=null; rellenarSiVacio(); guardar(); pintar(); };
+  const del = el('button','peligro','Eliminar'); del.onclick = ()=>borrar(it);
+  acc.append(del); p.append(acc); p.append(mv);
+  return p;
+}
+
+function pintarRegistro(){
+  const ol = document.getElementById('registro'); ol.innerHTML='';
+  document.getElementById('nreg').textContent = S.registro.length;
+  S.registro.forEach(r=> ol.append(el('li','', r.n + ' — ' + r.fecha)));
+}
+
+function pintar(){ pintarAviso(); pintarHoy(); pintarTabs(); pintarLista(); pintarRegistro(); }
+
+/* ---------- pie ---------- */
+document.getElementById('q').addEventListener('input', pintarLista);
+document.getElementById('nuevo').onclick = ()=>{
+  const n = prompt('Nombre del título nuevo:');
+  if(!n || !n.trim()) return;
+  S.items.push({ id:uid(), n:n.trim(), lista:tab, nota:'', bloques:[], prog:{b:null,c:null} });
+  guardar(); pintarLista(); pintarTabs();
+};
+document.getElementById('exportar').onclick = ()=>{
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], {type:'application/json'}));
+  a.download = 'respaldo-series-' + hoyStr() + '.json';
+  a.click();
+};
+document.getElementById('importar').onclick = ()=> document.getElementById('archivo').click();
+document.getElementById('archivo').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const fr = new FileReader();
+  fr.onload = ()=>{ try{ const d=JSON.parse(fr.result); if(!d.items) throw 0; S=d; pasarDias(); guardar(); pintar(); aviso='Copia cargada.'; pintarAviso(); }
+    catch(err){ alert('Ese archivo no sirve como respaldo.'); } };
+  fr.readAsText(f);
+};
+
+/* ---------- arranque ---------- */
+cargar(); pasarDias(); rellenarSiVacio(); guardar(); pintar();
+</script>
+</body>
+</html>
