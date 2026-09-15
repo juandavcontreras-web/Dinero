@@ -488,7 +488,7 @@ document.getElementById("reset").addEventListener("click",()=>{
 });
 
 /* ---------- aportes ---------- */
-const PEOPLE=["Emanuel","Mario","Leonard","Laura","Julieth","Leydi"];
+const PEOPLE=["Emanuel","Mario","Leonard","Laura","Julieth","Leydi","Luis Viloria"];
 const MKEY="vm01-money";
 let M=JSON.parse(localStorage.getItem(MKEY)||'{"buys":[],"pays":{}}');
 PEOPLE.forEach(p=>{if(!M.pays[p])M.pays[p]=[]});
@@ -505,7 +505,7 @@ function renderMoney(){
   const due=Math.max(0,total-paid);
 
   let h=`<section><div class="head"><h2>Aportes</h2><span class="count">${PEOPLE.length} personas</span></div>
-  <p class="lead">El gasto total se divide en partes iguales entre seis personas. La cuota se recalcula sola cada vez que se registra una compra.</p>
+  <p class="lead">El gasto total se divide en partes iguales entre siete personas. La cuota se recalcula sola cada vez que se registra una compra.</p>
 
   <div class="stats">
     <div class="stat"><div class="lbl">Gastado</div><div class="val">${cop(total)}</div></div>
