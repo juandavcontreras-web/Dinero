@@ -313,14 +313,14 @@ function pintarFormato(g, r){
   [{ln:FIRMA_A, f:r.firmaRecibe, rot:'FIRMA RECIBE'},{ln:FIRMA_B, f:r.firmaTecnico, rot:'FIRMA TECNICO'}].forEach(s=>{
     const cx=(s.ln[0]+s.ln[1])/2, ancho=s.ln[1]-s.ln[0];
     if(s.f && s.f.data){
-      const maxW=Math.min(48,ancho-6), maxH=6.4;
+      const maxW=Math.min(60,ancho-4), maxH=7.6;
       let w=maxW, h=maxW*(s.f.h/s.f.w);
       if(h>maxH){ h=maxH; w=maxH*(s.f.w/s.f.h); }
-      g.imagen(s.f.data, cx-w/2, Y.fir+0.9, w, h, 'JPEG');
+      g.imagen(s.f.data, cx-w/2, Y.fir+0.3, w, h, 'JPEG');
     }
     if(s.f && s.f.nombre){
       const txt = s.f.nombre + (s.f.cargo ? ' · '+s.f.cargo : '');
-      T(txt, cx, Y.rot-0.9,{a:'center',s:6.5});
+      T(txt, cx, Y.rot-0.25,{a:'center',s:5.8});
     }
     L(s.ln[0],Y.rot,s.ln[1],Y.rot);
     T(s.rot, cx, Y.rot+2.9,{a:'center',s:S});
