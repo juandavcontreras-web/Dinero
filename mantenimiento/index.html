@@ -220,9 +220,9 @@ function escapar(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':
 
 /* ===== Medidas exactas del formato en Word (mm) ===== */
 const C = [0,7.743,15.487,23.636,31.485,39.864,73.007,104.175,132.168,178.823];
-const W = 178.823, H = 99.995;
+const W = 178.823, H = 107.995;
 const Y = { head:0, et:13.688, op:17.022, val:21.449, mar:27.711, trh:38.241, caja:42.527,
-            obs:77.752, hs:82.109, fir:86.184, rot:96.132, fin:99.995 };
+            obs:77.752, hs:82.109, fir:86.184, rot:104.132, fin:107.995 };
 const INFO_Y = [0,3.740,7.056,10.372,13.688];
 const LIN_TRAB = [42.527,46.760,51.187,55.614,60.041,64.468,68.895,73.322,77.752];
 const FIRMA_A = [7.743,73.007], FIRMA_B = [97.4,155.6];
@@ -313,14 +313,14 @@ function pintarFormato(g, r){
   [{ln:FIRMA_A, f:r.firmaRecibe, rot:'FIRMA RECIBE'},{ln:FIRMA_B, f:r.firmaTecnico, rot:'FIRMA TECNICO'}].forEach(s=>{
     const cx=(s.ln[0]+s.ln[1])/2, ancho=s.ln[1]-s.ln[0];
     if(s.f && s.f.data){
-      const maxW=Math.min(60,ancho-4), maxH=7.6;
+      const maxW=Math.min(62,ancho-4), maxH=14;
       let w=maxW, h=maxW*(s.f.h/s.f.w);
       if(h>maxH){ h=maxH; w=maxH*(s.f.w/s.f.h); }
-      g.imagen(s.f.data, cx-w/2, Y.fir+0.3, w, h, 'JPEG');
+      g.imagen(s.f.data, cx-w/2, Y.fir+0.8, w, h, 'JPEG');
     }
     if(s.f && s.f.nombre){
       const txt = s.f.nombre + (s.f.cargo ? ' · '+s.f.cargo : '');
-      T(txt, cx, Y.rot-0.25,{a:'center',s:5.8});
+      T(txt, cx, Y.rot-0.7,{a:'center',s:6.5});
     }
     L(s.ln[0],Y.rot,s.ln[1],Y.rot);
     T(s.rot, cx, Y.rot+2.9,{a:'center',s:S});
@@ -366,7 +366,7 @@ function crearPDF(lista, dos){
   const { jsPDF } = window.jspdf;
   if(dos){
     const doc = new jsPDF({unit:'mm', format:[CARTA.w,CARTA.h], orientation:'portrait'});
-    const x0 = (CARTA.w-W)/2, tops=[32,147];
+    const x0 = (CARTA.w-W)/2, tops=[24,147];
     lista.forEach((r,i)=>{
       if(i>0 && i%2===0) doc.addPage();
       pintarFormato(adaptadorPDF(doc,x0,tops[i%2]), r);
@@ -490,6 +490,17 @@ function completarEquipo(campo,valor){
   if(n) toast('Se completaron los datos del equipo');
 }
 CAMPOS_SUG.forEach(c=>conectarSugerencias($(c),c));
+
+/* ===== Mayúsculas automáticas (todo menos el trabajo realizado) ===== */
+function forzarMayusculas(input){
+  input.style.textTransform='uppercase';
+  input.addEventListener('input',()=>{
+    const p=input.selectionStart, v=input.value, u=v.toLocaleUpperCase('es');
+    if(v!==u){ input.value=u; try{ input.setSelectionRange(p,p); }catch(e){} }
+  });
+}
+['equipo','servicio','marca','modelo','serie','inventario','observaciones','claseOtro','ovNombre','ovCargo']
+  .forEach(id=>forzarMayusculas($(id)));
 
 /* ===== Firma ===== */
 const firmas={recibe:null,tecnico:null};
