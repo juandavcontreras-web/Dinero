@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Mis tareas · Electromedicina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--teal:#2f9a8f;--teal-dark:#1f766d;--teal-soft:#e4f2f0;--ink:#20302f;--ink-soft:#5d6d6c;--line:#d3dedd;--bg:#f2f5f5;
+        --alta:#c0392b;--media:#c47b16;--baja:#5d6d6c;--alta-soft:#fbeae8;--media-soft:#fcf3e3;--baja-soft:#eef1f1}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-y:none}
+  body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none}
+  input,textarea{-webkit-user-select:text;user-select:text}
+  body.bloqueado{position:fixed;inset:0;overflow:hidden}
+  .wrap{width:100%;max-width:660px;margin:0 auto;padding:0 12px 96px}
+
+  header.top{background:#fff;border-bottom:1px solid var(--line);padding:12px 12px 8px;position:sticky;top:0;z-index:20}
+  header.top .inner{max-width:660px;margin:0 auto}
+  header.top .t{font-size:17px;font-weight:600;line-height:1.2}
+  header.top .c{font-size:12px;color:var(--ink-soft);margin-top:2px}
+  nav.tabs{max-width:660px;margin:10px auto 0;display:flex;gap:6px}
+  nav.tabs button{flex:1;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font:inherit;font-size:13px;font-weight:500;padding:8px 4px;border-radius:8px}
+  nav.tabs button[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+
+  .grupo{margin-top:16px}
+  .grupo>h2{margin:0 0 8px;font-size:13px;font-weight:600;color:var(--ink-soft);letter-spacing:.2px}
+  .grupo.vencidas>h2{color:var(--alta)}
+
+  .tarea{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+  .tarea .marca{flex:0 0 26px;height:26px;border:2px solid var(--line);border-radius:50%;margin-top:1px;position:relative}
+  .tarea .marca.ok{background:var(--teal);border-color:var(--teal)}
+  .tarea .marca.ok::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  .tarea .cuerpo{flex:1;min-width:0}
+  .tarea .tit{font-size:16px;font-weight:600;word-break:break-word}
+  .tarea.hecha .tit{text-decoration:line-through;color:var(--ink-soft);font-weight:500}
+  .tarea .det{font-size:13px;color:var(--ink-soft);margin-top:3px;word-break:break-word}
+  .tarea .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--baja-soft);color:var(--baja)}
+  .tag.ALTA{background:var(--alta-soft);color:var(--alta)}
+  .tag.MEDIA{background:var(--media-soft);color:var(--media)}
+  .tag.fecha{background:var(--teal-soft);color:var(--teal-dark)}
+  .tag.fecha.tarde{background:var(--alta-soft);color:var(--alta)}
+  .tag.lugar{background:#eef1f1;color:var(--ink-soft);font-weight:500}
+
+  .resumen{display:flex;gap:8px;margin-top:12px}
+  .resumen div{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .resumen .n{font-size:20px;font-weight:700;line-height:1.1}
+  .resumen .e{font-size:11px;color:var(--ink-soft);margin-top:2px}
+  .resumen .rojo .n{color:var(--alta)}
+
+  .empty{text-align:center;color:var(--ink-soft);font-size:14px;padding:40px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:14px}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:14px}
+  .card h3{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--teal-dark);padding-bottom:8px;border-bottom:1px solid var(--teal-soft)}
+  .hint{font-size:12px;color:var(--ink-soft)}
+
+  .actions{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));z-index:30}
+  .actions .inner{max-width:660px;margin:0 auto;display:flex;gap:8px}
+  .btn{border:none;border-radius:10px;font:inherit;font-size:15px;font-weight:600;padding:13px 14px;background:var(--teal);color:#fff;flex:1}
+  .btn:active{background:var(--teal-dark)}
+  .btn.ghost{background:#fff;color:var(--ink-soft);border:1px solid var(--line)}
+  .btn.rojo{background:#fff;color:var(--alta);border:1px solid var(--line)}
+
+  .overlay{position:fixed;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column}
+  .overlay .ohead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .overlay .ot{font-size:16px;font-weight:600}
+  .overlay .obody{flex:1;overflow:auto;padding:14px}
+  .overlay .ofoot{padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:8px}
+  label{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);margin:0 0 4px}
+  input,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px}
+  input:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+  textarea{resize:vertical;min-height:80px}
+  .field{margin-bottom:14px;position:relative}
+  .seg{display:flex;gap:6px}
+  .seg label{flex:1;margin:0;text-align:center;border:1px solid var(--line);border-radius:8px;padding:10px 4px;font-size:14px;color:var(--ink-soft);background:#fff}
+  .seg input{position:absolute;opacity:0;pointer-events:none}
+  .seg label:has(input:checked){background:var(--teal-soft);border-color:var(--teal);color:var(--teal-dark);font-weight:600}
+  .rapidos{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .rapidos button{border:1px solid var(--line);background:#fff;color:var(--teal-dark);border-radius:20px;font:inherit;font-size:13px;font-weight:600;padding:7px 12px}
+  .sug{position:absolute;left:0;right:0;top:100%;margin-top:3px;background:#fff;border:1px solid var(--teal);border-radius:8px;box-shadow:0 8px 18px rgba(20,50,48,.14);z-index:15;overflow:hidden}
+  .sug div{padding:11px 12px;font-size:15px;border-top:1px solid var(--line)}
+  .sug div:first-child{border-top:none}
+
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;padding:11px 15px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:120;max-width:88%;text-align:center}
+  .toast.show{opacity:1}
+  .hidden{display:none}
+  button{cursor:pointer}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="t">Mis tareas</div>
+    <div class="c" id="subtitulo">Electromedicina</div>
+    <nav class="tabs">
+      <button id="tabPend" aria-selected="true">Pendientes</button>
+      <button id="tabHechas" aria-selected="false">Hechas</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="viewPend">
+    <div class="resumen">
+      <div class="rojo"><div class="n" id="nVencidas">0</div><div class="e">vencidas</div></div>
+      <div><div class="n" id="nHoy">0</div><div class="e">para hoy</div></div>
+      <div><div class="n" id="nTotal">0</div><div class="e">pendientes</div></div>
+    </div>
+    <div id="listaPend"></div>
+  </section>
+
+  <section id="viewHechas" class="hidden">
+    <div id="listaHechas"></div>
+    <div class="card">
+      <h3>Mantenimiento de la lista</h3>
+      <p class="hint" style="margin-top:0">Las tareas se guardan en este teléfono. Exporta de vez en cuando por si cambias de equipo.</p>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn ghost" id="btnExport">Exportar</button>
+        <button class="btn ghost" id="btnImport">Importar</button>
+      </div>
+      <button class="btn rojo" style="width:100%;margin-top:8px" id="btnLimpiarHechas">Borrar todas las hechas</button>
+      <input type="file" id="fileImport" accept="application/json" class="hidden">
+    </div>
+  </section>
+</main>
+
+<div class="actions">
+  <div class="inner"><button class="btn" id="btnNueva">+ Nueva tarea</button></div>
+</div>
+
+<div class="overlay hidden" id="ov">
+  <div class="ohead">
+    <div class="ot" id="ovTitulo">Nueva tarea</div>
+    <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:14px" id="ovCerrar">Cerrar</button>
+  </div>
+  <div class="obody">
+    <div class="field">
+      <label for="fTitulo">¿Qué hay que hacer?</label>
+      <input type="text" id="fTitulo" placeholder="Escribir la tarea" autocapitalize="sentences">
+    </div>
+    <div class="field">
+      <label for="fLugar">Servicio o equipo (opcional)</label>
+      <input type="text" id="fLugar" placeholder="Escribir el servicio o el equipo" autocomplete="off" autocapitalize="sentences">
+    </div>
+    <div class="field">
+      <label for="fDetalle">Detalle (opcional)</label>
+      <textarea id="fDetalle" placeholder="Notas, repuestos, a quién pedirle"></textarea>
+    </div>
+    <div class="field">
+      <label for="fFecha">Fecha límite</label>
+      <input type="date" id="fFecha">
+      <div class="rapidos">
+        <button type="button" data-dias="0">Hoy</button>
+        <button type="button" data-dias="1">Mañana</button>
+        <button type="button" data-dias="7">En una semana</button>
+        <button type="button" data-dias="-1">Sin fecha</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Prioridad</label>
+      <div class="seg">
+        <label><input type="radio" name="prio" value="ALTA">Alta</label>
+        <label><input type="radio" name="prio" value="MEDIA" checked>Media</label>
+        <label><input type="radio" name="prio" value="BAJA">Baja</label>
+      </div>
+    </div>
+  </div>
+  <div class="ofoot">
+    <button class="btn rojo hidden" style="flex:0 0 auto" id="ovBorrar">Borrar</button>
+    <button class="btn" id="ovGuardar">Guardar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'lm_tareas_v1';
+const PRIOS = {ALTA:3, MEDIA:2, BAJA:1};
+let editando = null;
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);}
+function leer(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){return [];}}
+function guardar(a){try{localStorage.setItem(KEY,JSON.stringify(a));return true;}catch(e){toast('No hay espacio para guardar');return false;}}
+function escapar(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function normalizar(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+const z = n => String(n).padStart(2,'0');
+function iso(d){return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
+function hoyISO(){return iso(new Date());}
+function masDias(n){const d=new Date(); d.setDate(d.getDate()+n); return iso(d);}
+function dias(a,b){ // días de a hasta b
+  const [y1,m1,d1]=a.split('-').map(Number), [y2,m2,d2]=b.split('-').map(Number);
+  return Math.round((Date.UTC(y2,m2-1,d2)-Date.UTC(y1,m1-1,d1))/86400000);
+}
+function textoFecha(f){
+  if(!f) return '';
+  const n = dias(hoyISO(), f);
+  if(n===0) return 'Hoy';
+  if(n===1) return 'Mañana';
+  if(n===-1) return 'Venció ayer';
+  if(n<0) return 'Venció hace '+(-n)+' días';
+  if(n<7) return 'En '+n+' días';
+  return f.split('-').reverse().join('/');
+}
+
+/* ===== Lista ===== */
+function grupoDe(t){
+  if(!t.fecha) return {orden:5, nombre:'Sin fecha'};
+  const n = dias(hoyISO(), t.fecha);
+  if(n<0) return {orden:0, nombre:'Vencidas'};
+  if(n===0) return {orden:1, nombre:'Para hoy'};
+  if(n===1) return {orden:2, nombre:'Mañana'};
+  if(n<=7) return {orden:3, nombre:'Esta semana'};
+  return {orden:4, nombre:'Más adelante'};
+}
+function ordenar(a,b){
+  if(!!a.fecha !== !!b.fecha) return a.fecha ? -1 : 1;
+  if(a.fecha && a.fecha!==b.fecha) return a.fecha.localeCompare(b.fecha);
+  return PRIOS[b.prio]-PRIOS[a.prio];
+}
+function tarjeta(t){
+  const g = grupoDe(t);
+  const tags = [];
+  if(t.fecha) tags.push('<span class="tag fecha'+(g.orden===0?' tarde':'')+'">'+escapar(textoFecha(t.fecha))+'</span>');
+  tags.push('<span class="tag '+t.prio+'">'+(t.prio==='ALTA'?'Prioridad alta':t.prio==='MEDIA'?'Prioridad media':'Prioridad baja')+'</span>');
+  if(t.lugar) tags.push('<span class="tag lugar">'+escapar(t.lugar)+'</span>');
+  return '<div class="tarea'+(t.hecha?' hecha':'')+'" data-id="'+t.id+'">'
+    + '<div class="marca'+(t.hecha?' ok':'')+'" data-check="'+t.id+'"></div>'
+    + '<div class="cuerpo" data-abrir="'+t.id+'"><div class="tit">'+escapar(t.titulo)+'</div>'
+    + (t.detalle?'<div class="det">'+escapar(t.detalle)+'</div>':'')
+    + '<div class="tags">'+tags.join('')+'</div></div></div>';
+}
+function pintar(){
+  const arr = leer();
+  const pend = arr.filter(t=>!t.hecha).sort(ordenar);
+  const hechas = arr.filter(t=>t.hecha).sort((a,b)=>String(b.completada||'').localeCompare(String(a.completada||'')));
+
+  $('nVencidas').textContent = pend.filter(t=>grupoDe(t).orden===0).length;
+  $('nHoy').textContent = pend.filter(t=>grupoDe(t).orden===1).length;
+  $('nTotal').textContent = pend.length;
+
+  if(!pend.length){
+    $('listaPend').innerHTML = '<div class="empty">No tienes tareas pendientes.<br>Toca "Nueva tarea" para agregar una.</div>';
+  } else {
+    const grupos = {};
+    pend.forEach(t=>{ const g=grupoDe(t); (grupos[g.orden]=grupos[g.orden]||{nombre:g.nombre,items:[]}).items.push(t); });
+    $('listaPend').innerHTML = Object.keys(grupos).sort().map(k=>{
+      const g=grupos[k];
+      return '<div class="grupo'+(k==='0'?' vencidas':'')+'"><h2>'+g.nombre+' ('+g.items.length+')</h2>'+g.items.map(tarjeta).join('')+'</div>';
+    }).join('');
+  }
+  $('listaHechas').innerHTML = hechas.length
+    ? '<div class="grupo"><h2>Hechas ('+hechas.length+')</h2>'+hechas.map(tarjeta).join('')+'</div>'
+    : '<div class="empty">Aquí van apareciendo las tareas que vayas terminando.</div>';
+}
+
+document.addEventListener('click', e=>{
+  const c = e.target.closest('[data-check]'), a = e.target.closest('[data-abrir]');
+  if(c){
+    const arr=leer(); const t=arr.find(x=>x.id===c.dataset.check); if(!t) return;
+    t.hecha = !t.hecha;
+    t.completada = t.hecha ? new Date().toISOString() : null;
+    guardar(arr); pintar(); toast(t.hecha?'Tarea terminada':'Tarea devuelta a pendientes');
+    return;
+  }
+  if(a){ abrir(leer().find(x=>x.id===a.dataset.abrir)); }
+});
+
+/* ===== Formulario ===== */
+function abrir(t){
+  editando = t || null;
+  $('ovTitulo').textContent = t ? 'Editar tarea' : 'Nueva tarea';
+  $('ovBorrar').classList.toggle('hidden', !t);
+  $('fTitulo').value = t?t.titulo:'';
+  $('fLugar').value = t?(t.lugar||''):'';
+  $('fDetalle').value = t?(t.detalle||''):'';
+  $('fFecha').value = t?(t.fecha||''):hoyISO();
+  document.querySelector('input[name=prio][value="'+((t&&t.prio)||'MEDIA')+'"]').checked = true;
+  $('ov').classList.remove('hidden');
+  document.body.classList.add('bloqueado');
+  if(!t) setTimeout(()=>$('fTitulo').focus(), 80);
+}
+function cerrar(){ $('ov').classList.add('hidden'); document.body.classList.remove('bloqueado'); editando=null; }
+$('btnNueva').addEventListener('click', ()=>abrir(null));
+$('ovCerrar').addEventListener('click', cerrar);
+document.querySelectorAll('.rapidos button').forEach(b=>b.addEventListener('click',()=>{
+  const d = Number(b.dataset.dias);
+  $('fFecha').value = d<0 ? '' : masDias(d);
+}));
+$('ovGuardar').addEventListener('click', ()=>{
+  const titulo = $('fTitulo').value.trim();
+  if(!titulo){ toast('Falta escribir la tarea'); $('fTitulo').focus(); return; }
+  const datos = {
+    titulo,
+    lugar: $('fLugar').value.trim(),
+    detalle: $('fDetalle').value.trim(),
+    fecha: $('fFecha').value,
+    prio: document.querySelector('input[name=prio]:checked').value
+  };
+  const arr = leer();
+  if(editando){
+    Object.assign(arr.find(x=>x.id===editando.id), datos);
+  } else {
+    arr.push(Object.assign({id:Date.now()+'-'+Math.random().toString(36).slice(2,7), hecha:false, creada:new Date().toISOString()}, datos));
+  }
+  guardar(arr); pintar(); cerrar();
+  toast(editando?'Tarea actualizada':'Tarea agregada');
+});
+$('ovBorrar').addEventListener('click', ()=>{
+  if(!editando) return;
+  if(!confirm('¿Borrar la tarea "'+editando.titulo+'"?')) return;
+  guardar(leer().filter(x=>x.id!==editando.id)); pintar(); cerrar(); toast('Tarea borrada');
+});
+
+/* ===== Sugerencias de servicio o equipo ===== */
+(function(){
+  const input=$('fLugar'), cont=input.parentElement; let caja=null;
+  const cerrarSug=()=>{if(caja){caja.remove();caja=null;}};
+  const abrirSug=()=>{
+    cerrarSug();
+    const vistos=new Set(), l=[];
+    leer().slice().reverse().forEach(t=>{const v=(t.lugar||'').trim(); const k=normalizar(v); if(v&&!vistos.has(k)){vistos.add(k);l.push(v);}});
+    const q=normalizar(input.value);
+    const res=(q?l.filter(v=>normalizar(v).includes(q)):l).slice(0,3);
+    if(!res.length) return;
+    caja=document.createElement('div'); caja.className='sug';
+    caja.innerHTML=res.map(v=>'<div>'+escapar(v)+'</div>').join('');
+    caja.addEventListener('pointerdown',e=>{e.preventDefault();const d=e.target.closest('div');if(d){input.value=d.textContent;cerrarSug();}});
+    cont.appendChild(caja);
+  };
+  input.addEventListener('focus',abrirSug);
+  input.addEventListener('input',abrirSug);
+  input.addEventListener('blur',()=>setTimeout(cerrarSug,120));
+})();
+
+/* ===== Respaldo ===== */
+$('btnExport').addEventListener('click',()=>{
+  const b=new Blob([JSON.stringify(leer())],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='respaldo-tareas-'+hoyISO()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+});
+$('btnImport').addEventListener('click',()=>$('fileImport').click());
+$('fileImport').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const n=JSON.parse(fr.result); if(!Array.isArray(n)) throw 0;
+      const act=leer(), ids=new Set(act.map(x=>x.id));
+      const sumar=n.filter(x=>!ids.has(x.id));
+      guardar(act.concat(sumar)); pintar(); toast('Se agregaron '+sumar.length+' tareas');
+    }catch(err){ toast('Ese archivo no sirve como respaldo'); }
+  };
+  fr.readAsText(f); e.target.value='';
+});
+$('btnLimpiarHechas').addEventListener('click',()=>{
+  const hechas=leer().filter(t=>t.hecha).length;
+  if(!hechas){ toast('No hay tareas hechas'); return; }
+  if(confirm('¿Borrar las '+hechas+' tareas hechas? No se pueden recuperar.')){
+    guardar(leer().filter(t=>!t.hecha)); pintar(); toast('Listo');
+  }
+});
+
+/* ===== Pestañas ===== */
+function mostrar(v){
+  $('viewPend').classList.toggle('hidden', v!=='pend');
+  $('viewHechas').classList.toggle('hidden', v!=='hechas');
+  $('tabPend').setAttribute('aria-selected', v==='pend');
+  $('tabHechas').setAttribute('aria-selected', v==='hechas');
+  window.scrollTo({top:0});
+}
+$('tabPend').addEventListener('click',()=>mostrar('pend'));
+$('tabHechas').addEventListener('click',()=>mostrar('hechas'));
+
+/* ===== Inicio ===== */
+(function(){
+  const d=new Date();
+  const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  $('subtitulo').textContent = dias[d.getDay()]+', '+d.getDate()+' de '+meses[d.getMonth()];
+})();
+pintar();
+</script>
+</body>
+</html>
