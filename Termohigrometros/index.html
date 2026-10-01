@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Inventario de termohigrómetros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--teal:#2f9a8f;--teal-dark:#1f766d;--teal-soft:#e4f2f0;--ink:#20302f;--ink-soft:#5d6d6c;--line:#d3dedd;--bg:#f2f5f5;
+        --rojo:#c0392b;--rojo-soft:#fbeae8;--ambar:#c47b16;--ambar-soft:#fcf3e3}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-y:none}
+  body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none}
+  input,textarea{-webkit-user-select:text;user-select:text}
+  body.bloqueado{position:fixed;inset:0;overflow:hidden}
+  .wrap{width:100%;max-width:660px;margin:0 auto;padding:0 12px 96px}
+
+  header.top{background:#fff;border-bottom:1px solid var(--line);padding:12px 12px 10px;position:sticky;top:0;z-index:20}
+  header.top .inner{max-width:660px;margin:0 auto}
+  header.top .t{font-size:17px;font-weight:600;line-height:1.2}
+  header.top .c{font-size:12px;color:var(--ink-soft);margin-top:2px}
+  header.top input.buscar{margin-top:10px;width:100%;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:9px}
+
+  .resumen{display:flex;gap:8px;margin-top:12px}
+  .resumen div{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+  .resumen .n{font-size:20px;font-weight:700;line-height:1.1}
+  .resumen .e{font-size:11px;color:var(--ink-soft);margin-top:2px}
+  .resumen .rojo .n{color:var(--rojo)}
+  .resumen .ambar .n{color:var(--ambar)}
+
+  .servicio{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .servicio>.head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;background:var(--teal-soft)}
+  .servicio>.head .s{font-size:15px;font-weight:600;color:var(--teal-dark)}
+  .servicio>.head .n{font-size:12px;color:var(--ink-soft)}
+  .servicio .mas{border:1px solid var(--teal);background:#fff;color:var(--teal-dark);border-radius:8px;font:inherit;font-size:13px;font-weight:600;padding:8px 11px}
+  .equipo{padding:12px;border-top:1px solid var(--line)}
+  .equipo .ub{font-size:15px;font-weight:600}
+  .equipo .se{font-size:13px;color:var(--ink-soft);margin-top:2px}
+  .equipo .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;background:#eef1f1;color:var(--ink-soft)}
+  .tag.ok{background:var(--teal-soft);color:var(--teal-dark)}
+  .tag.pronto{background:var(--ambar-soft);color:var(--ambar)}
+  .tag.vencida{background:var(--rojo-soft);color:var(--rojo)}
+
+  .empty{text-align:center;color:var(--ink-soft);font-size:14px;padding:40px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:16px}
+  .card h3{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--teal-dark);padding-bottom:8px;border-bottom:1px solid var(--teal-soft)}
+  .hint{font-size:12px;color:var(--ink-soft)}
+
+  .actions{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));z-index:30}
+  .actions .inner{max-width:660px;margin:0 auto;display:flex;gap:8px}
+  .btn{border:none;border-radius:10px;font:inherit;font-size:15px;font-weight:600;padding:13px 14px;background:var(--teal);color:#fff;flex:1}
+  .btn:active{background:var(--teal-dark)}
+  .btn.ghost{background:#fff;color:var(--ink-soft);border:1px solid var(--line)}
+  .btn.rojo{background:#fff;color:var(--rojo);border:1px solid var(--line)}
+
+  .overlay{position:fixed;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column}
+  .overlay .ohead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .overlay .ot{font-size:16px;font-weight:600}
+  .overlay .obody{flex:1;overflow:auto;padding:14px}
+  .overlay .ofoot{padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:8px}
+  label{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);margin:0 0 4px}
+  input,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px}
+  input:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+  textarea{resize:vertical;min-height:70px}
+  .field{margin-bottom:14px;position:relative}
+  .row{display:flex;gap:9px}
+  .row>*{flex:1;min-width:0}
+  .sug{position:absolute;left:0;right:0;top:100%;margin-top:3px;background:#fff;border:1px solid var(--teal);border-radius:8px;box-shadow:0 8px 18px rgba(20,50,48,.14);z-index:15;overflow:hidden}
+  .sug div{padding:11px 12px;font-size:15px;border-top:1px solid var(--line)}
+  .sug div:first-child{border-top:none}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;padding:11px 15px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:120;max-width:88%;text-align:center}
+  .toast.show{opacity:1}
+  .hidden{display:none}
+  button{cursor:pointer}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="t">Inventario de termohigrómetros</div>
+    <div class="c" id="sub">Clínica La Merced</div>
+    <input type="search" class="buscar" id="buscar" placeholder="Buscar por servicio, ubicación o serie">
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="resumen">
+    <div><div class="n" id="nTotal">0</div><div class="e">equipos</div></div>
+    <div><div class="n" id="nServicios">0</div><div class="e">servicios</div></div>
+    <div class="ambar"><div class="n" id="nPronto">0</div><div class="e">por calibrar</div></div>
+    <div class="rojo"><div class="n" id="nVencidas">0</div><div class="e">vencidas</div></div>
+  </div>
+
+  <div id="lista"></div>
+
+  <div class="card">
+    <h3>Descargar y respaldar</h3>
+    <button class="btn" style="width:100%" id="btnExcel">Descargar inventario en Excel</button>
+    <p class="hint" style="margin-top:8px">El inventario se guarda en este teléfono. Exporta el respaldo de vez en cuando por si cambias de equipo.</p>
+    <div class="row" style="margin-top:10px">
+      <button class="btn ghost" id="btnExport">Exportar respaldo</button>
+      <button class="btn ghost" id="btnImport">Importar respaldo</button>
+    </div>
+    <input type="file" id="fileImport" accept="application/json" class="hidden">
+  </div>
+</main>
+
+<div class="actions">
+  <div class="inner"><button class="btn" id="btnNuevo">+ Agregar termohigrómetro</button></div>
+</div>
+
+<div class="overlay hidden" id="ov">
+  <div class="ohead">
+    <div class="ot" id="ovTitulo">Nuevo termohigrómetro</div>
+    <button class="btn ghost" style="flex:0 0 auto;padding:8px 12px;font-size:14px" id="ovCerrar">Cerrar</button>
+  </div>
+  <div class="obody">
+    <div class="field">
+      <label for="fServicio">Servicio</label>
+      <input type="text" id="fServicio" placeholder="Escribir el servicio" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="fUbicacion">Ubicación dentro del servicio</label>
+      <input type="text" id="fUbicacion" placeholder="Ej: nevera de medicamentos, pared del pasillo" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="fSerie">Número de serie</label>
+      <input type="text" id="fSerie" placeholder="Escribir la serie" autocomplete="off">
+    </div>
+    <div class="row">
+      <div class="field"><label for="fMarca">Marca</label><input type="text" id="fMarca" autocomplete="off"></div>
+      <div class="field"><label for="fModelo">Modelo</label><input type="text" id="fModelo" autocomplete="off"></div>
+    </div>
+    <div class="field">
+      <label for="fInventario">N° de inventario (opcional)</label>
+      <input type="text" id="fInventario" autocomplete="off">
+    </div>
+    <div class="row">
+      <div class="field"><label for="fUltima">Última calibración</label><input type="date" id="fUltima"></div>
+      <div class="field"><label for="fProxima">Próxima calibración</label><input type="date" id="fProxima"></div>
+    </div>
+    <div class="field">
+      <label for="fObs">Observaciones (opcional)</label>
+      <textarea id="fObs" placeholder="Estado del equipo, novedades"></textarea>
+    </div>
+  </div>
+  <div class="ofoot">
+    <button class="btn rojo hidden" style="flex:0 0 auto" id="ovBorrar">Borrar</button>
+    <button class="btn" id="ovGuardar">Guardar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'lm_termohigrometros_v1';
+let editando = null;
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
+function leer(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){return [];}}
+function guardar(a){try{localStorage.setItem(KEY,JSON.stringify(a));return true;}catch(e){toast('No hay espacio para guardar');return false;}}
+function escapar(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function normalizar(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function may(s){return String(s||'').toLocaleUpperCase('es');}
+const z = n => String(n).padStart(2,'0');
+function iso(d){return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
+function hoyISO(){return iso(new Date());}
+function dias(a,b){
+  if(!a||!b) return null;
+  const [y1,m1,d1]=a.split('-').map(Number), [y2,m2,d2]=b.split('-').map(Number);
+  return Math.round((Date.UTC(y2,m2-1,d2)-Date.UTC(y1,m1-1,d1))/86400000);
+}
+function fechaCorta(f){ return f ? f.split('-').reverse().join('/') : ''; }
+function estado(t){
+  if(!t.proxima) return {clase:'', texto:'Sin fecha de calibración'};
+  const n = dias(hoyISO(), t.proxima);
+  if(n<0) return {clase:'vencida', texto:'Calibración vencida ('+fechaCorta(t.proxima)+')'};
+  if(n<=30) return {clase:'pronto', texto:'Calibrar en '+n+' días'};
+  return {clase:'ok', texto:'Calibrada hasta '+fechaCorta(t.proxima)};
+}
+
+/* ===== Lista ===== */
+function pintar(){
+  const arr = leer();
+  const q = normalizar($('buscar').value);
+  const vistos = arr.filter(t=>!q || normalizar(t.servicio+' '+t.ubicacion+' '+t.serie+' '+t.marca+' '+t.modelo+' '+t.inventario).includes(q));
+
+  $('nTotal').textContent = arr.length;
+  $('nServicios').textContent = new Set(arr.map(t=>normalizar(t.servicio))).size;
+  $('nPronto').textContent = arr.filter(t=>estado(t).clase==='pronto').length;
+  $('nVencidas').textContent = arr.filter(t=>estado(t).clase==='vencida').length;
+
+  if(!vistos.length){
+    $('lista').innerHTML = '<div class="empty">'+(arr.length
+      ? 'No hay resultados para esa búsqueda.'
+      : 'Todavía no hay termohigrómetros.<br>Toca "Agregar termohigrómetro" para empezar.')+'</div>';
+    return;
+  }
+  const g = {};
+  vistos.forEach(t=>{ const k=may(t.servicio)||'SIN SERVICIO'; (g[k]=g[k]||[]).push(t); });
+  $('lista').innerHTML = Object.keys(g).sort().map(k=>{
+    const items = g[k].sort((a,b)=>String(a.ubicacion).localeCompare(String(b.ubicacion))).map(t=>{
+      const e = estado(t);
+      const tags = ['<span class="tag '+e.clase+'">'+escapar(e.texto)+'</span>'];
+      if(t.ultima) tags.push('<span class="tag">Última: '+fechaCorta(t.ultima)+'</span>');
+      if(t.inventario) tags.push('<span class="tag">Inv. '+escapar(t.inventario)+'</span>');
+      return '<div class="equipo" data-abrir="'+t.id+'">'
+        + '<div class="ub">'+escapar(t.ubicacion||'Sin ubicación')+'</div>'
+        + '<div class="se">Serie: '+escapar(t.serie||'sin serie')+(t.marca?' · '+escapar(t.marca):'')+(t.modelo?' '+escapar(t.modelo):'')+'</div>'
+        + (t.obs?'<div class="se">'+escapar(t.obs)+'</div>':'')
+        + '<div class="tags">'+tags.join('')+'</div></div>';
+    }).join('');
+    return '<div class="servicio"><div class="head"><div><div class="s">'+escapar(k)+'</div>'
+      + '<div class="n">'+g[k].length+' equipo'+(g[k].length>1?'s':'')+'</div></div>'
+      + '<button class="mas" data-add="'+escapar(k)+'">+ Agregar</button></div>'+items+'</div>';
+  }).join('');
+}
+$('buscar').addEventListener('input', pintar);
+
+document.addEventListener('click', e=>{
+  const a = e.target.closest('[data-abrir]'), m = e.target.closest('[data-add]');
+  if(m){ abrir(null, m.dataset.add); return; }
+  if(a){ abrir(leer().find(x=>x.id===a.dataset.abrir)); }
+});
+
+/* ===== Formulario ===== */
+['fServicio','fUbicacion','fSerie','fMarca','fModelo','fInventario','fObs'].forEach(id=>{
+  const el=$(id);
+  el.style.textTransform='uppercase';
+  el.addEventListener('input',()=>{
+    const p=el.selectionStart, v=el.value, u=may(v);
+    if(v!==u){ el.value=u; try{ el.setSelectionRange(p,p); }catch(e){} }
+  });
+});
+$('fUltima').addEventListener('change',()=>{
+  if($('fUltima').value && !$('fProxima').value){
+    const d=new Date($('fUltima').value+'T12:00:00');
+    d.setFullYear(d.getFullYear()+1);
+    $('fProxima').value = iso(d);
+  }
+});
+function abrir(t, servicio){
+  editando = t || null;
+  $('ovTitulo').textContent = t ? 'Editar termohigrómetro' : 'Nuevo termohigrómetro';
+  $('ovBorrar').classList.toggle('hidden', !t);
+  $('fServicio').value = t ? t.servicio : (servicio||'');
+  $('fUbicacion').value = t?t.ubicacion:'';
+  $('fSerie').value = t?t.serie:'';
+  $('fMarca').value = t?(t.marca||''):'';
+  $('fModelo').value = t?(t.modelo||''):'';
+  $('fInventario').value = t?(t.inventario||''):'';
+  $('fUltima').value = t?(t.ultima||''):'';
+  $('fProxima').value = t?(t.proxima||''):'';
+  $('fObs').value = t?(t.obs||''):'';
+  $('ov').classList.remove('hidden');
+  document.body.classList.add('bloqueado');
+  setTimeout(()=>{ (t?$('fUbicacion'):(servicio?$('fUbicacion'):$('fServicio'))).focus(); }, 80);
+}
+function cerrar(){ $('ov').classList.add('hidden'); document.body.classList.remove('bloqueado'); editando=null; }
+$('btnNuevo').addEventListener('click',()=>abrir(null));
+$('ovCerrar').addEventListener('click', cerrar);
+$('ovGuardar').addEventListener('click',()=>{
+  const servicio=$('fServicio').value.trim(), ubicacion=$('fUbicacion').value.trim(), serie=$('fSerie').value.trim();
+  if(!servicio){ toast('Falta el servicio'); $('fServicio').focus(); return; }
+  if(!ubicacion){ toast('Falta la ubicación'); $('fUbicacion').focus(); return; }
+  const arr = leer();
+  if(serie){
+    const rep = arr.find(x=>normalizar(x.serie)===normalizar(serie) && (!editando || x.id!==editando.id));
+    if(rep && !confirm('Esa serie ya está registrada en '+rep.servicio+' ('+rep.ubicacion+'). ¿Guardar de todos modos?')) return;
+  }
+  const datos = {servicio, ubicacion, serie,
+    marca:$('fMarca').value.trim(), modelo:$('fModelo').value.trim(), inventario:$('fInventario').value.trim(),
+    ultima:$('fUltima').value, proxima:$('fProxima').value, obs:$('fObs').value.trim()};
+  if(editando) Object.assign(arr.find(x=>x.id===editando.id), datos);
+  else arr.push(Object.assign({id:Date.now()+'-'+Math.random().toString(36).slice(2,7), creado:new Date().toISOString()}, datos));
+  guardar(arr); pintar();
+  const seguir = !editando;
+  const serv = servicio;
+  cerrar();
+  toast(seguir?'Agregado a '+serv:'Equipo actualizado');
+  if(seguir && confirm('¿Agregar otro termohigrómetro de '+serv+'?')) abrir(null, serv);
+});
+$('ovBorrar').addEventListener('click',()=>{
+  if(!editando) return;
+  if(!confirm('¿Borrar el termohigrómetro de '+editando.ubicacion+'?')) return;
+  guardar(leer().filter(x=>x.id!==editando.id)); pintar(); cerrar(); toast('Equipo borrado');
+});
+
+/* ===== Sugerencias de servicio ===== */
+(function(){
+  const input=$('fServicio'), cont=input.parentElement; let caja=null;
+  const cerrarSug=()=>{if(caja){caja.remove();caja=null;}};
+  const abrirSug=()=>{
+    cerrarSug();
+    const vistos=new Set(), l=[];
+    leer().slice().reverse().forEach(t=>{const v=may(t.servicio).trim(); if(v&&!vistos.has(v)){vistos.add(v);l.push(v);}});
+    const q=normalizar(input.value);
+    const res=(q?l.filter(v=>normalizar(v).includes(q)):l).slice(0,3);
+    if(!res.length) return;
+    caja=document.createElement('div'); caja.className='sug';
+    caja.innerHTML=res.map(v=>'<div>'+escapar(v)+'</div>').join('');
+    caja.addEventListener('pointerdown',e=>{e.preventDefault();const d=e.target.closest('div');if(d){input.value=d.textContent;cerrarSug();$('fUbicacion').focus();}});
+    cont.appendChild(caja);
+  };
+  input.addEventListener('focus',abrirSug);
+  input.addEventListener('input',abrirSug);
+  input.addEventListener('blur',()=>setTimeout(cerrarSug,120));
+})();
+
+/* ===== Excel ===== */
+$('btnExcel').addEventListener('click',()=>{
+  const arr = leer();
+  if(!arr.length){ toast('Todavía no hay equipos'); return; }
+  if(!window.XLSX){ toast('No se pudo cargar el generador de Excel. Revisa la conexión.'); return; }
+  const datos = arr.slice().sort((a,b)=>(may(a.servicio)+a.ubicacion).localeCompare(may(b.servicio)+b.ubicacion)).map(t=>({
+    'SERVICIO': may(t.servicio),
+    'UBICACION': may(t.ubicacion),
+    'MARCA': may(t.marca),
+    'MODELO': may(t.modelo),
+    'NUMERO DE SERIE': may(t.serie),
+    'INVENTARIO': may(t.inventario),
+    'ULTIMA CALIBRACION': fechaCorta(t.ultima),
+    'PROXIMA CALIBRACION': fechaCorta(t.proxima),
+    'ESTADO': may(estado(t).clase==='vencida'?'VENCIDA':estado(t).clase==='pronto'?'POR CALIBRAR':estado(t).clase==='ok'?'AL DIA':'SIN FECHA'),
+    'OBSERVACIONES': may(t.obs)
+  }));
+  const hoja = XLSX.utils.json_to_sheet(datos);
+  hoja['!cols'] = [{wch:24},{wch:30},{wch:16},{wch:16},{wch:18},{wch:14},{wch:18},{wch:19},{wch:14},{wch:40}];
+  const libro = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(libro, hoja, 'TERMOHIGROMETROS');
+  XLSX.writeFile(libro, 'Inventario termohigrometros '+hoyISO()+'.xlsx');
+});
+
+/* ===== Respaldo ===== */
+$('btnExport').addEventListener('click',()=>{
+  const b=new Blob([JSON.stringify(leer())],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='respaldo-termohigrometros-'+hoyISO()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+});
+$('btnImport').addEventListener('click',()=>$('fileImport').click());
+$('fileImport').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const n=JSON.parse(fr.result); if(!Array.isArray(n)) throw 0;
+      const act=leer(), ids=new Set(act.map(x=>x.id));
+      const sumar=n.filter(x=>!ids.has(x.id));
+      guardar(act.concat(sumar)); pintar(); toast('Se agregaron '+sumar.length+' equipos');
+    }catch(err){ toast('Ese archivo no sirve como respaldo'); }
+  };
+  fr.readAsText(f); e.target.value='';
+});
+
+pintar();
+</script>
+</body>
+</html>
