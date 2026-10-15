@@ -93,7 +93,8 @@
   .persona .estado.debe{color:var(--clay)}
   .persona .estado.pago{color:var(--moss)}
   .persona .abonar{border:1px solid var(--moss);background:var(--card);color:var(--moss);border-radius:999px;
-        font:inherit;font-size:13px;font-weight:700;padding:8px 14px}
+        font:inherit;font-size:13px;font-weight:700;padding:8px 14px;white-space:nowrap}
+  .persona .abonar.gris{border-color:var(--mist);color:var(--ink-2)}
 
   .aviso{background:var(--ocre-soft);color:#7E5411;border-radius:16px;padding:11px 14px;font-size:13.5px;font-weight:600;margin-bottom:12px}
 
@@ -241,7 +242,9 @@ function pintar(){
         + '<div class="avance"><i style="width:'+avc+'%"></i></div>'
         + '<div class="abajo"><div class="estado '+(falta>0.5?'debe':'pago')+'">'
         + (falta>0.5 ? 'Ha puesto '+plata(ab)+' · falta '+plata(falta) : (ab>cuota+0.5?'Puso de más '+plata(ab-cuota):'Ya está a paz y salvo'))
-        + '</div><button class="abonar" data-abonar="'+x.id+'">Abonó</button></div></div>';
+        + '</div><div style="display:flex;gap:7px;flex:0 0 auto">'
+        + '<button class="abonar gris" data-gente="'+x.id+'">Editar</button>'
+        + '<button class="abonar" data-abonar="'+x.id+'">Abonó</button></div></div></div>';
     }).join('') : '<div class="vacio">Agrega a los integrantes para repartir el gasto.</div>') + '</div></section>';
 
   /* cierre */
@@ -259,7 +262,14 @@ function pintar(){
   const nv = $('nVal'); if(nv){ formatear(nv); nv.addEventListener('keydown',e=>{ if(e.key==='Enter') agregarCompra(); }); }
   const nn = $('nNom'); if(nn) nn.addEventListener('keydown',e=>{ if(e.key==='Enter') agregarGente(); });
   document.querySelectorAll('input[name=modo]').forEach(el=>el.addEventListener('change',()=>{
-    editar(p=>{ p.reparto=el.value; }); pintar();
+    editar(p=>{
+      p.reparto = el.value;
+      if(el.value==='pct' && p.gente.length && p.gente.every(g=>!pct(g.pct))){
+        const parte = Math.round(1000/p.gente.length)/10;
+        p.gente.forEach(g=>g.pct=String(parte).replace('.',','));
+      }
+    });
+    pintar();
   }));
 }
 function formatear(el){
@@ -321,7 +331,8 @@ function panelGente(x){
   const lista = (x.abonos||[]).slice().reverse();
   abrirPanel('<h2>'+esc(x.nom)+'</h2>'
     + '<div class="campo"><label for="gNom">Nombre</label><input id="gNom" value="'+esc(x.nom)+'"></div>'
-    + (p.reparto==='pct'?'<div class="campo"><label for="gPct">Porcentaje de aporte</label><input id="gPct" inputmode="decimal" value="'+esc(x.pct)+'" placeholder="Ej: 25"></div>':'')
+    + '<div class="campo"><label for="gPct">Porcentaje de aporte</label><input id="gPct" inputmode="decimal" value="'+esc(x.pct)+'" placeholder="Ej: 25">'
+    + (p.reparto==='igual'?'<div style="font-size:12.5px;color:var(--ink-2);margin-top:6px">Ahora el proyecto está en partes iguales, así que este número no se usa. Cambia a “Por porcentaje” para que aplique.</div>':'')+'</div>'
     + (lista.length?'<div class="campo"><label>Abonos</label>'+lista.map(a=>'<div class="item"><div class="q"><b>'+plata(a.valor)+'</b><span>'+fecha(a.fecha)+'</span></div><button class="abonar" data-quitar-abono="'+x.id+'|'+a.id+'">Quitar</button></div>').join('')+'</div>':'')
     + '<button class="boton" data-guardar-gente="'+x.id+'">Guardar</button>'
     + '<button class="boton peligro" data-borrar-gente="'+x.id+'">Quitar del proyecto</button>'
