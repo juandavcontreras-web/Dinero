@@ -3,615 +3,451 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Proyectos y presupuesto</title>
+<title>Proyectos · cuentas y cuotas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--teal:#2f9a8f;--teal-dark:#1f766d;--teal-soft:#e4f2f0;--ink:#20302f;--ink-soft:#5d6d6c;--line:#d3dedd;--bg:#f2f5f5;
-        --rojo:#c0392b;--rojo-soft:#fbeae8;--verde:#1f766d;--verde-soft:#e4f2f0;--ambar:#c47b16;--ambar-soft:#fcf3e3}
+  :root{
+    --ink:#15322B; --ink-2:#4A6B61; --paper:#F3F6F1; --card:#FFFFFF;
+    --moss:#2F6B57; --moss-soft:#DCEADF; --ocre:#C9872A; --ocre-soft:#F7EBD6;
+    --clay:#A3482E; --clay-soft:#F6E4DD; --mist:#E3EAE1;
+  }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-y:none}
-  body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+    font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%;
+    -webkit-user-select:none;user-select:none;
+  }
   input,textarea,select{-webkit-user-select:text;user-select:text}
-  body.bloqueado{position:fixed;inset:0;overflow:hidden}
-  .wrap{width:100%;max-width:660px;margin:0 auto;padding:0 12px 96px}
+  body.quieto{position:fixed;inset:0;overflow:hidden}
+  .hoja{max-width:620px;margin:0 auto;padding:0 16px 120px}
+  h1,h2,.cifra,.num{font-family:Fraunces,Georgia,serif;font-variation-settings:"SOFT" 40,"opsz" 40}
 
-  header.top{background:#fff;border-bottom:1px solid var(--line);padding:12px 12px 10px;position:sticky;top:0;z-index:20}
-  header.top .inner{max-width:660px;margin:0 auto}
-  header.top .fila{display:flex;align-items:center;gap:10px}
-  header.top .t{font-size:17px;font-weight:600;line-height:1.2;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  header.top .c{font-size:12px;color:var(--ink-soft);margin-top:2px}
-  .mini{border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:8px;font:inherit;font-size:13px;font-weight:600;padding:7px 10px;flex:0 0 auto}
-  nav.tabs{max-width:660px;margin:10px auto 0;display:flex;gap:6px}
-  nav.tabs button{flex:1;border:1px solid var(--line);background:#fff;color:var(--ink-soft);font:inherit;font-size:13px;font-weight:500;padding:8px 4px;border-radius:8px}
-  nav.tabs button[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+  /* ---- proyectos ---- */
+  .carrusel{display:flex;gap:8px;overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .carrusel::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1px solid var(--mist);background:var(--card);color:var(--ink-2);
+        border-radius:999px;padding:9px 16px;font:inherit;font-size:14px;font-weight:600;white-space:nowrap}
+  .chip[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip.mas{color:var(--moss);border-style:dashed}
 
-  .resumen{display:flex;gap:8px;margin-top:12px}
-  .resumen div{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
-  .resumen .n{font-size:17px;font-weight:700;line-height:1.15}
-  .resumen .e{font-size:11px;color:var(--ink-soft);margin-top:2px}
+  /* ---- cabecera del proyecto ---- */
+  .cabeza{position:relative;background:var(--ink);color:#fff;border-radius:28px 28px 28px 10px;padding:22px 22px 20px;margin-top:10px;overflow:hidden}
+  .cabeza .curva{position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.055)}
+  .cabeza h1{margin:0;font-size:21px;font-weight:600;line-height:1.2;position:relative}
+  .cabeza .nota{margin-top:3px;font-size:13px;color:#A9C4B9;position:relative}
+  .cabeza .total{position:relative;margin-top:16px}
+  .cabeza .total .num{font-size:38px;font-weight:600;letter-spacing:-.5px;display:block;line-height:1.05}
+  .cabeza .total .pie{font-size:13px;color:#A9C4B9;margin-top:2px}
+  .barra{position:relative;height:7px;background:rgba(255,255,255,.16);border-radius:99px;margin-top:14px;overflow:hidden}
+  .barra i{display:block;height:100%;background:var(--ocre);border-radius:99px}
+  .cabeza .editar{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.12);border:none;color:#fff;
+        border-radius:999px;font:inherit;font-size:13px;font-weight:600;padding:7px 13px}
 
-  .fila-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px;display:flex;gap:10px;align-items:flex-start}
-  .fila-item .cuerpo{flex:1;min-width:0}
-  .fila-item .tit{font-size:15px;font-weight:600;word-break:break-word}
-  .fila-item .sub{font-size:12px;color:var(--ink-soft);margin-top:3px}
-  .fila-item .val{font-size:15px;font-weight:700;white-space:nowrap}
-  .fila-item.listo .tit{text-decoration:line-through;color:var(--ink-soft)}
-  .marca{flex:0 0 24px;height:24px;border:2px solid var(--line);border-radius:6px;position:relative;margin-top:2px}
-  .marca.ok{background:var(--teal);border-color:var(--teal)}
-  .marca.ok::after{content:"";position:absolute;left:7px;top:3px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  /* ---- secciones ---- */
+  section{margin-top:26px}
+  section>h2{margin:0 0 4px;font-size:18px;font-weight:600}
+  section>.intro{font-size:13px;color:var(--ink-2);margin:0 0 12px}
 
-  .proyecto{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}
-  .proyecto .nom{font-size:16px;font-weight:600}
-  .proyecto .meta{font-size:12px;color:var(--ink-soft);margin-top:3px}
-  .proyecto .cifra{font-size:18px;font-weight:700;color:var(--teal-dark);margin-top:8px}
+  /* ---- agregar rápido ---- */
+  .rapido{display:flex;gap:8px;align-items:stretch;background:var(--card);border:1px solid var(--mist);
+          border-radius:18px;padding:8px;margin-bottom:12px}
+  .rapido input{flex:1;min-width:0;border:none;background:transparent;font:inherit;font-size:16px;padding:9px 8px;color:var(--ink)}
+  .rapido input:focus{outline:none}
+  .rapido input.corto{flex:0 0 108px;text-align:right;font-weight:600}
+  .rapido .sep{width:1px;background:var(--mist);margin:6px 0}
+  .rapido button{flex:0 0 auto;border:none;background:var(--moss);color:#fff;border-radius:13px;width:44px;font-size:22px;line-height:1}
 
-  .persona{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:8px}
-  .persona .lin1{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-  .persona .nom{font-size:16px;font-weight:600}
-  .persona .pct{font-size:14px;font-weight:700;color:var(--teal-dark)}
-  .persona table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
-  .persona td{padding:3px 0;color:var(--ink-soft)}
-  .persona td:last-child{text-align:right;color:var(--ink);font-weight:600}
-  .saldo{margin-top:8px;font-size:13px;font-weight:700;padding:7px 10px;border-radius:8px;text-align:center}
-  .saldo.debe{background:var(--rojo-soft);color:var(--rojo)}
-  .saldo.leDeben{background:var(--verde-soft);color:var(--verde)}
-  .saldo.ok{background:#eef1f1;color:var(--ink-soft)}
+  /* ---- lista de compras ---- */
+  .item{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--mist)}
+  .item:last-child{border-bottom:none}
+  .item .punto{flex:0 0 10px;height:10px;border-radius:50%;background:var(--moss)}
+  .item .punto.falta{background:transparent;border:2px solid var(--ocre)}
+  .item .q{flex:1;min-width:0}
+  .item .q b{display:block;font-weight:600;font-size:15.5px;word-break:break-word}
+  .item .q span{font-size:12.5px;color:var(--ink-2)}
+  .item .v{font-family:Fraunces,Georgia,serif;font-size:16px;font-weight:600;white-space:nowrap}
+  .item .v.falta{color:var(--ocre);font-size:13px;font-family:inherit;font-weight:600}
+  .vacio{color:var(--ink-2);font-size:14px;padding:18px 4px}
 
-  .aviso{background:var(--ambar-soft);color:var(--ambar);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;margin-top:10px}
-  .empty{text-align:center;color:var(--ink-soft);font-size:14px;padding:38px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:14px}
-  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:16px}
-  .card h3{margin:0 0 10px;font-size:13px;font-weight:600;color:var(--teal-dark);padding-bottom:8px;border-bottom:1px solid var(--teal-soft)}
-  .hint{font-size:12px;color:var(--ink-soft)}
+  /* ---- integrantes ---- */
+  .modo{display:flex;gap:7px;margin-bottom:12px}
+  .modo label{flex:1;text-align:center;border:1px solid var(--mist);background:var(--card);border-radius:14px;
+        padding:11px 6px;font-size:14px;color:var(--ink-2);font-weight:500}
+  .modo input{position:absolute;opacity:0;pointer-events:none}
+  .modo label:has(input:checked){background:var(--moss-soft);border-color:var(--moss);color:var(--moss);font-weight:700}
 
-  .actions{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));z-index:30}
-  .actions .inner{max-width:660px;margin:0 auto;display:flex;gap:8px}
-  .btn{border:none;border-radius:10px;font:inherit;font-size:15px;font-weight:600;padding:13px 14px;background:var(--teal);color:#fff;flex:1}
-  .btn:active{background:var(--teal-dark)}
-  .btn.ghost{background:#fff;color:var(--ink-soft);border:1px solid var(--line)}
-  .btn.rojo{background:#fff;color:var(--rojo);border:1px solid var(--line)}
+  .gente{display:flex;flex-direction:column;gap:10px}
+  .persona{background:var(--card);border:1px solid var(--mist);border-radius:20px;padding:15px 16px}
+  .persona .arriba{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .persona .nom{font-size:16.5px;font-weight:600}
+  .persona .cuota{font-family:Fraunces,Georgia,serif;font-size:19px;font-weight:600}
+  .persona .pct{font-size:12.5px;color:var(--ink-2)}
+  .persona .avance{height:6px;background:var(--mist);border-radius:99px;margin:11px 0 9px;overflow:hidden}
+  .persona .avance i{display:block;height:100%;background:var(--moss);border-radius:99px}
+  .persona .abajo{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .persona .estado{font-size:13.5px;font-weight:600}
+  .persona .estado.debe{color:var(--clay)}
+  .persona .estado.pago{color:var(--moss)}
+  .persona .abonar{border:1px solid var(--moss);background:var(--card);color:var(--moss);border-radius:999px;
+        font:inherit;font-size:13px;font-weight:700;padding:8px 14px}
 
-  .overlay{position:fixed;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column}
-  .overlay .ohead{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
-  .overlay .ot{font-size:16px;font-weight:600}
-  .overlay .obody{flex:1;overflow:auto;padding:14px}
-  .overlay .ofoot{padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:8px}
-  label{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);margin:0 0 4px}
-  input,textarea,select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:11px}
-  input:focus,textarea:focus,select:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
-  textarea{resize:vertical;min-height:70px}
-  .field{margin-bottom:14px;position:relative}
-  .row{display:flex;gap:9px}
-  .row>*{flex:1;min-width:0}
-  .seg{display:flex;gap:6px}
-  .seg label{flex:1;margin:0;text-align:center;border:1px solid var(--line);border-radius:8px;padding:10px 4px;font-size:14px;color:var(--ink-soft);background:#fff}
-  .seg input{position:absolute;opacity:0;pointer-events:none}
-  .seg label:has(input:checked){background:var(--teal-soft);border-color:var(--teal);color:var(--teal-dark);font-weight:600}
-  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;padding:11px 15px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:120;max-width:88%;text-align:center}
+  .aviso{background:var(--ocre-soft);color:#7E5411;border-radius:16px;padding:11px 14px;font-size:13.5px;font-weight:600;margin-bottom:12px}
+
+  .cierre{background:var(--card);border:1px solid var(--mist);border-radius:22px;padding:16px;margin-top:26px}
+  .cierre .linea{display:flex;justify-content:space-between;padding:7px 0;font-size:14.5px;color:var(--ink-2)}
+  .cierre .linea b{color:var(--ink);font-family:Fraunces,Georgia,serif;font-size:16px}
+  .cierre .linea.fuerte{border-top:1px solid var(--mist);margin-top:6px;padding-top:12px;color:var(--ink);font-weight:600}
+
+  .boton{display:block;width:100%;border:none;border-radius:16px;font:inherit;font-size:15px;font-weight:600;
+        padding:14px;background:var(--ink);color:#fff;margin-top:10px}
+  .boton.suave{background:var(--card);color:var(--ink-2);border:1px solid var(--mist)}
+  .boton.peligro{background:var(--card);color:var(--clay);border:1px solid var(--mist)}
+  .par{display:flex;gap:9px}
+  .par>*{flex:1}
+
+  /* ---- panel ---- */
+  .panel{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;background:rgba(21,50,43,.4)}
+  .panel .caja{width:100%;max-width:620px;margin:0 auto;background:var(--paper);border-radius:26px 26px 0 0;
+        padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+  .panel h2{margin:0 0 14px;font-size:19px;font-weight:600}
+  .campo{margin-bottom:13px}
+  .campo label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:5px;font-weight:500}
+  .campo input,.campo textarea,.campo select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--card);
+        border:1px solid var(--mist);border-radius:14px;padding:12px}
+  .campo input:focus,.campo textarea:focus,.campo select:focus{outline:2px solid var(--moss);outline-offset:1px;border-color:var(--moss)}
+  .campo textarea{min-height:70px;resize:vertical}
+
+  .aire{text-align:center;color:var(--ink-2);font-size:14px;padding:46px 20px;line-height:1.6}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:14px;
+        padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:120;max-width:88%;text-align:center}
   .toast.show{opacity:1}
-  .hidden{display:none}
+  .oculto{display:none}
   button{cursor:pointer}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="inner">
-    <div class="fila">
-      <button class="mini hidden" id="btnVolver">‹ Proyectos</button>
-      <div class="t" id="titulo">Proyectos</div>
-      <button class="mini hidden" id="btnEditarProy">Editar</button>
-    </div>
-    <div class="c" id="sub">Control de gastos y aportes</div>
-    <nav class="tabs hidden" id="tabs">
-      <button id="tabGastos" aria-selected="true">Gastos</button>
-      <button id="tabMateriales" aria-selected="false">Materiales</button>
-      <button id="tabGente" aria-selected="false">Integrantes</button>
-    </nav>
-  </div>
-</header>
+<div class="carrusel" id="carrusel"></div>
 
-<main class="wrap">
-  <!-- lista de proyectos -->
-  <section id="viewProyectos">
-    <div id="listaProyectos"></div>
-    <div class="card">
-      <h3>Respaldo</h3>
-      <p class="hint" style="margin-top:0">Todo se guarda en este teléfono. Exporta de vez en cuando y guarda el archivo en tu correo.</p>
-      <div class="row" style="margin-top:10px">
-        <button class="btn ghost" id="btnExport">Exportar</button>
-        <button class="btn ghost" id="btnImport">Importar</button>
-      </div>
-      <input type="file" id="fileImport" accept="application/json" class="hidden">
-    </div>
-  </section>
-
-  <!-- dentro de un proyecto -->
-  <section id="viewProyecto" class="hidden">
-    <div class="resumen">
-      <div><div class="n" id="rGastado">$ 0</div><div class="e">gastado</div></div>
-      <div><div class="n" id="rPresu">—</div><div class="e">presupuesto</div></div>
-      <div><div class="n" id="rSaldo">—</div><div class="e">disponible</div></div>
-    </div>
-    <div id="cuerpoProyecto"></div>
-  </section>
+<main class="hoja">
+  <div id="todo"></div>
 </main>
 
-<div class="actions">
-  <div class="inner"><button class="btn" id="btnPrincipal">+ Nuevo proyecto</button></div>
-</div>
-
-<!-- ===== Overlay proyecto ===== -->
-<div class="overlay hidden" id="ovProy">
-  <div class="ohead"><div class="ot" id="ovProyTit">Nuevo proyecto</div><button class="mini" data-cerrar="ovProy">Cerrar</button></div>
-  <div class="obody">
-    <div class="field"><label for="pNombre">Nombre del proyecto</label><input type="text" id="pNombre" placeholder="Escribir el nombre"></div>
-    <div class="field"><label for="pDesc">Descripción (opcional)</label><textarea id="pDesc" placeholder="De qué se trata"></textarea></div>
-    <div class="field"><label for="pPresu">Presupuesto total (opcional)</label><input type="text" id="pPresu" inputmode="numeric" placeholder="$ 0"></div>
-    <div class="field">
-      <label>Cómo se reparte el aporte</label>
-      <div class="seg">
-        <label><input type="radio" name="reparto" value="igual" checked>Partes iguales</label>
-        <label><input type="radio" name="reparto" value="pct">Porcentaje por persona</label>
-      </div>
-      <p class="hint" style="margin-top:6px">Lo puedes cambiar cuando quieras desde esta misma pantalla.</p>
-    </div>
-  </div>
-  <div class="ofoot">
-    <button class="btn rojo hidden" style="flex:0 0 auto" id="pBorrar">Borrar</button>
-    <button class="btn" id="pGuardar">Guardar</button>
-  </div>
-</div>
-
-<!-- ===== Overlay gasto ===== -->
-<div class="overlay hidden" id="ovGasto">
-  <div class="ohead"><div class="ot" id="ovGastoTit">Nuevo gasto</div><button class="mini" data-cerrar="ovGasto">Cerrar</button></div>
-  <div class="obody">
-    <div class="field"><label for="gDesc">¿Qué se compró?</label><input type="text" id="gDesc" placeholder="Escribir el material o servicio"></div>
-    <div class="field"><label for="gValor">Valor</label><input type="text" id="gValor" inputmode="numeric" placeholder="$ 0"></div>
-    <div class="field"><label for="gQuien">¿Quién lo pagó?</label><select id="gQuien"></select></div>
-    <div class="row">
-      <div class="field"><label for="gFecha">Fecha</label><input type="date" id="gFecha"></div>
-      <div class="field"><label for="gCant">Cantidad</label><input type="text" id="gCant" inputmode="numeric" placeholder="1"></div>
-    </div>
-    <div class="field"><label for="gNota">Nota (opcional)</label><textarea id="gNota" placeholder="Dónde se compró, factura, etc."></textarea></div>
-  </div>
-  <div class="ofoot">
-    <button class="btn rojo hidden" style="flex:0 0 auto" id="gBorrar">Borrar</button>
-    <button class="btn" id="gGuardar">Guardar</button>
-  </div>
-</div>
-
-<!-- ===== Overlay material ===== -->
-<div class="overlay hidden" id="ovMat">
-  <div class="ohead"><div class="ot" id="ovMatTit">Nuevo material</div><button class="mini" data-cerrar="ovMat">Cerrar</button></div>
-  <div class="obody">
-    <div class="field"><label for="mDesc">Material que se necesita</label><input type="text" id="mDesc" placeholder="Escribir el material"></div>
-    <div class="row">
-      <div class="field"><label for="mCant">Cantidad</label><input type="text" id="mCant" inputmode="numeric" placeholder="1"></div>
-      <div class="field"><label for="mEst">Valor estimado</label><input type="text" id="mEst" inputmode="numeric" placeholder="$ 0"></div>
-    </div>
-    <div class="field"><label for="mNota">Nota (opcional)</label><textarea id="mNota" placeholder="Dónde conseguirlo, referencia"></textarea></div>
-  </div>
-  <div class="ofoot">
-    <button class="btn rojo hidden" style="flex:0 0 auto" id="mBorrar">Borrar</button>
-    <button class="btn" id="mGuardar">Guardar</button>
-  </div>
-</div>
-
-<!-- ===== Overlay integrante ===== -->
-<div class="overlay hidden" id="ovInt">
-  <div class="ohead"><div class="ot" id="ovIntTit">Nuevo integrante</div><button class="mini" data-cerrar="ovInt">Cerrar</button></div>
-  <div class="obody">
-    <div class="field"><label for="iNombre">Nombre</label><input type="text" id="iNombre" placeholder="Escribir el nombre" autocapitalize="words"></div>
-    <div class="field" id="campoPct">
-      <label for="iPct">Porcentaje de aporte (%)</label>
-      <input type="text" id="iPct" inputmode="decimal" placeholder="Ej: 25">
-      <p class="hint" style="margin-top:6px">El proyecto está en partes iguales; si pones porcentajes, cambia el reparto en "Editar proyecto".</p>
-    </div>
-    <div class="field"><label for="iNota">Nota (opcional)</label><input type="text" id="iNota" placeholder="Rol, teléfono, lo que quieras"></div>
-  </div>
-  <div class="ofoot">
-    <button class="btn rojo hidden" style="flex:0 0 auto" id="iBorrar">Borrar</button>
-    <button class="btn" id="iGuardar">Guardar</button>
-  </div>
-</div>
-
+<div class="panel oculto" id="panel"><div class="caja" id="cajaPanel"></div></div>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const $ = id => document.getElementById(id);
-const KEY = 'lm_proyectos_presupuesto_v1';
-let proyectoActual = null, pestana = 'gastos';
-let editandoProy = null, editandoGasto = null, editandoMat = null, editandoInt = null;
+const LLAVE = 'lm_proyectos_v2';
+let actual = null;
 
-function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);}
-function leer(){try{return JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){return [];}}
-function guardar(a){try{localStorage.setItem(KEY,JSON.stringify(a));return true;}catch(e){toast('No hay espacio para guardar');return false;}}
-function escapar(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+/* ---------- datos ---------- */
+function leer(){ try{ return JSON.parse(localStorage.getItem(LLAVE)||'[]'); }catch(e){ return []; } }
+function grabar(a){ try{ localStorage.setItem(LLAVE,JSON.stringify(a)); return true; }catch(e){ aviso('No hay espacio para guardar'); return false; } }
+function proy(){ return leer().find(p=>p.id===actual); }
+function editar(fn){ const a=leer(), i=a.findIndex(p=>p.id===actual); if(i<0) return; fn(a[i]); grabar(a); }
+const id = () => Date.now()+'-'+Math.random().toString(36).slice(2,6);
+const esc = s => String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const z = n => String(n).padStart(2,'0');
-function hoyISO(){const d=new Date();return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
-function fechaCorta(f){return f?f.split('-').reverse().join('/'):'';}
-function nuevoId(){return Date.now()+'-'+Math.random().toString(36).slice(2,7);}
-function plata(n){ n = Math.round(Number(n)||0); return '$ '+n.toLocaleString('es-CO'); }
-function soloNumeros(v){ return Number(String(v).replace(/[^\d]/g,''))||0; }
-function formatearCampo(el){
-  el.addEventListener('input',()=>{
-    const n = soloNumeros(el.value);
-    el.value = n ? n.toLocaleString('es-CO') : '';
-  });
-}
-['pPresu','gValor','mEst'].forEach(id=>formatearCampo($(id)));
-function pctNum(v){ return Number(String(v).replace(',','.').replace(/[^\d.]/g,''))||0; }
-function fpct(n){ return (Math.round(n*10)/10).toString().replace('.',',')+'%'; }
+function hoy(){ const d=new Date(); return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()); }
+function fecha(f){ return f?f.split('-').reverse().join('/'):''; }
+const nums = v => Number(String(v).replace(/[^\d]/g,''))||0;
+const pct = v => Number(String(v).replace(',','.').replace(/[^\d.]/g,''))||0;
+function plata(n){ return '$ '+Math.round(Number(n)||0).toLocaleString('es-CO'); }
+function fp(n){ return (Math.round(n*10)/10).toString().replace('.',',')+'%'; }
+function aviso(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2400); }
 
-function proy(){ return leer().find(p=>p.id===proyectoActual); }
-function guardarProy(mod){
-  const arr = leer(); const i = arr.findIndex(p=>p.id===proyectoActual);
-  if(i<0) return; mod(arr[i]); guardar(arr);
+function comprado(p){ return p.compras.filter(c=>c.valor>0).reduce((s,c)=>s+c.valor,0); }
+function cuotaDe(p,x){
+  const t = comprado(p);
+  if(!p.gente.length) return 0;
+  return p.reparto==='igual' ? t/p.gente.length : t*pct(x.pct)/100;
 }
-function porcentajeDe(p, intId){
-  if(!p.integrantes.length) return 0;
-  if(p.reparto==='igual') return 100/p.integrantes.length;
-  return pctNum((p.integrantes.find(x=>x.id===intId)||{}).pct);
-}
-function totalGastado(p){ return p.gastos.reduce((s,g)=>s+(Number(g.valor)||0),0); }
+function abonado(x){ return (x.abonos||[]).reduce((s,a)=>s+(Number(a.valor)||0),0); }
 
-/* ================= Lista de proyectos ================= */
-function pintarProyectos(){
-  const arr = leer();
-  $('listaProyectos').innerHTML = arr.length ? arr.slice().sort((a,b)=>String(b.creado).localeCompare(String(a.creado))).map(p=>{
-    const t = totalGastado(p);
-    const pend = p.materiales.filter(m=>!m.comprado).length;
-    return '<div class="proyecto" data-proy="'+p.id+'">'
-      + '<div class="nom">'+escapar(p.nombre)+'</div>'
-      + (p.desc?'<div class="meta">'+escapar(p.desc)+'</div>':'')
-      + '<div class="meta">'+p.integrantes.length+' integrante'+(p.integrantes.length===1?'':'s')
-      + ' · '+p.gastos.length+' gasto'+(p.gastos.length===1?'':'s')
-      + (pend?' · '+pend+' material'+(pend===1?'':'es')+' por comprar':'')+'</div>'
-      + '<div class="cifra">'+plata(t)+(p.presupuesto?' <span style="font-size:13px;color:var(--ink-soft);font-weight:500">de '+plata(p.presupuesto)+'</span>':'')+'</div>'
-      + '</div>';
-  }).join('') : '<div class="empty">Todavía no tienes proyectos.<br>Toca "Nuevo proyecto" para crear el primero.</div>';
+/* ---------- carrusel de proyectos ---------- */
+function pintarCarrusel(){
+  const ps = leer();
+  $('carrusel').innerHTML = ps.map(p=>'<button class="chip" data-ir="'+p.id+'" aria-current="'+(p.id===actual)+'">'+esc(p.nombre)+'</button>').join('')
+    + '<button class="chip mas" data-nuevo="1">+ Proyecto</button>';
 }
 
-/* ================= Dentro del proyecto ================= */
-function pintarProyecto(){
-  const p = proy(); if(!p){ irAProyectos(); return; }
-  const total = totalGastado(p);
-  $('titulo').textContent = p.nombre;
-  $('sub').textContent = p.reparto==='igual' ? 'Aporte en partes iguales' : 'Aporte por porcentaje';
-  $('rGastado').textContent = plata(total);
-  $('rPresu').textContent = p.presupuesto ? plata(p.presupuesto) : '—';
-  $('rSaldo').textContent = p.presupuesto ? plata(p.presupuesto-total) : '—';
-
-  if(pestana==='gastos') pintarGastos(p);
-  if(pestana==='materiales') pintarMateriales(p);
-  if(pestana==='gente') pintarGente(p, total);
-
-  $('btnPrincipal').textContent = pestana==='gastos' ? '+ Nuevo gasto' : pestana==='materiales' ? '+ Nuevo material' : '+ Nuevo integrante';
-}
-function nombreDe(p,id){ const i=p.integrantes.find(x=>x.id===id); return i?i.nombre:''; }
-
-function pintarGastos(p){
-  const gs = p.gastos.slice().sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
-  let h = gs.length ? gs.map(g=>'<div class="fila-item" data-gasto="'+g.id+'"><div class="cuerpo">'
-      + '<div class="tit">'+escapar(g.desc)+(Number(g.cant)>1?' <span style="font-weight:500;color:var(--ink-soft)">x'+g.cant+'</span>':'')+'</div>'
-      + '<div class="sub">'+fechaCorta(g.fecha)+(g.quien?' · '+escapar(nombreDe(p,g.quien)):'')+(g.nota?' · '+escapar(g.nota):'')+'</div>'
-      + '</div><div class="val">'+plata(g.valor)+'</div></div>').join('')
-    : '<div class="empty">Sin gastos todavía.<br>Toca "Nuevo gasto" para agregar la primera compra.</div>';
-  h += '<div class="card"><h3>Descargar</h3><button class="btn" style="width:100%" id="btnExcel">Descargar este proyecto en Excel</button></div>';
-  $('cuerpoProyecto').innerHTML = h;
-  $('btnExcel').addEventListener('click', excel);
-}
-
-function pintarMateriales(p){
-  const pend = p.materiales.filter(m=>!m.comprado), list = p.materiales.filter(m=>m.comprado);
-  const est = pend.reduce((s,m)=>s+(Number(m.estimado)||0)*(Number(m.cant)||1),0);
-  const item = m => '<div class="fila-item'+(m.comprado?' listo':'')+'">'
-      + '<div class="marca'+(m.comprado?' ok':'')+'" data-mcheck="'+m.id+'"></div>'
-      + '<div class="cuerpo" data-mat="'+m.id+'"><div class="tit">'+escapar(m.desc)+(Number(m.cant)>1?' x'+m.cant:'')+'</div>'
-      + (m.nota?'<div class="sub">'+escapar(m.nota)+'</div>':'')+'</div>'
-      + '<div class="val" style="font-size:13px;color:var(--ink-soft)">'+(m.estimado?plata(m.estimado):'')+'</div></div>';
-  let h = '';
-  h += '<div class="card" style="margin-top:12px"><h3>Por comprar ('+pend.length+')</h3>'
-     + (pend.length?'<div class="hint">Estimado: '+plata(est)+'</div>':'<div class="hint">No hay materiales pendientes.</div>')+'</div>';
-  h += pend.map(item).join('');
-  if(list.length) h += '<div style="margin-top:16px;font-size:13px;font-weight:600;color:var(--ink-soft)">Ya comprados ('+list.length+')</div>'+list.map(item).join('');
-  $('cuerpoProyecto').innerHTML = h;
-}
-
-function pintarGente(p, total){
-  let h = '';
-  if(p.reparto==='pct' && p.integrantes.length){
-    const suma = p.integrantes.reduce((s,i)=>s+pctNum(i.pct),0);
-    if(Math.abs(suma-100)>0.5) h += '<div class="aviso">Los porcentajes suman '+fpct(suma)+'. Deberían sumar 100%.</div>';
-  }
-  h += p.integrantes.length ? p.integrantes.map(i=>{
-    const pct = porcentajeDe(p,i.id);
-    const corresponde = total*pct/100;
-    const pagado = p.gastos.filter(g=>g.quien===i.id).reduce((s,g)=>s+(Number(g.valor)||0),0);
-    const dif = pagado-corresponde;
-    const clase = Math.abs(dif)<1 ? 'ok' : (dif>0?'leDeben':'debe');
-    const texto = Math.abs(dif)<1 ? 'Está a paz y salvo' : (dif>0?'Le deben '+plata(dif):'Debe poner '+plata(-dif));
-    return '<div class="persona" data-int="'+i.id+'">'
-      + '<div class="lin1"><div class="nom">'+escapar(i.nombre)+'</div><div class="pct">'+fpct(pct)+'</div></div>'
-      + (i.nota?'<div class="sub" style="font-size:12px;color:var(--ink-soft)">'+escapar(i.nota)+'</div>':'')
-      + '<table><tr><td>Le corresponde</td><td>'+plata(corresponde)+'</td></tr>'
-      + '<tr><td>Ha puesto</td><td>'+plata(pagado)+'</td></tr></table>'
-      + '<div class="saldo '+clase+'">'+texto+'</div></div>';
-  }).join('') : '<div class="empty">Agrega los integrantes para repartir el gasto.</div>';
-
-  h += '<div class="card"><h3>Reparto del aporte</h3>'
-     + '<div class="seg" id="segReparto">'
-     + '<label><input type="radio" name="rep2" value="igual"'+(p.reparto==='igual'?' checked':'')+'>Partes iguales</label>'
-     + '<label><input type="radio" name="rep2" value="pct"'+(p.reparto==='pct'?' checked':'')+'>Por porcentaje</label></div>'
-     + (p.reparto==='pct'?'<button class="btn ghost" style="width:100%;margin-top:10px" id="btnRepartir">Repartir 100% en partes iguales</button>':'')
-     + '<p class="hint" style="margin-top:8px">En partes iguales el porcentaje se calcula solo según cuántos integrantes haya.</p></div>';
-  $('cuerpoProyecto').innerHTML = h;
-
-  document.querySelectorAll('input[name=rep2]').forEach(el=>el.addEventListener('change',()=>{
-    guardarProy(p=>{p.reparto=el.value;}); pintarProyecto();
-  }));
-  if($('btnRepartir')) $('btnRepartir').addEventListener('click',()=>{
-    guardarProy(p=>{ const n=p.integrantes.length||1; p.integrantes.forEach(i=>i.pct=String(Math.round(1000/n)/10)); });
-    pintarProyecto(); toast('Porcentajes repartidos');
-  });
-}
-
-/* ================= Navegación ================= */
-function irAProyectos(){
-  proyectoActual=null;
-  $('viewProyectos').classList.remove('hidden'); $('viewProyecto').classList.add('hidden');
-  $('tabs').classList.add('hidden'); $('btnVolver').classList.add('hidden'); $('btnEditarProy').classList.add('hidden');
-  $('titulo').textContent='Proyectos'; $('sub').textContent='Control de gastos y aportes';
-  $('btnPrincipal').textContent='+ Nuevo proyecto';
-  pintarProyectos(); window.scrollTo({top:0});
-}
-function entrar(id){
-  proyectoActual=id; pestana='gastos';
-  $('viewProyectos').classList.add('hidden'); $('viewProyecto').classList.remove('hidden');
-  $('tabs').classList.remove('hidden'); $('btnVolver').classList.remove('hidden'); $('btnEditarProy').classList.remove('hidden');
-  marcarPestana(); pintarProyecto(); window.scrollTo({top:0});
-}
-function marcarPestana(){
-  $('tabGastos').setAttribute('aria-selected', pestana==='gastos');
-  $('tabMateriales').setAttribute('aria-selected', pestana==='materiales');
-  $('tabGente').setAttribute('aria-selected', pestana==='gente');
-}
-$('btnVolver').addEventListener('click', irAProyectos);
-['gastos','materiales','gente'].forEach(t=>{
-  $('tab'+(t==='gastos'?'Gastos':t==='materiales'?'Materiales':'Gente')).addEventListener('click',()=>{
-    pestana=t; marcarPestana(); pintarProyecto(); window.scrollTo({top:0});
-  });
-});
-
-document.addEventListener('click', e=>{
-  const p=e.target.closest('[data-proy]'), g=e.target.closest('[data-gasto]'),
-        m=e.target.closest('[data-mat]'), mc=e.target.closest('[data-mcheck]'), i=e.target.closest('[data-int]');
-  const c=e.target.closest('[data-cerrar]');
-  if(c){ cerrar(c.dataset.cerrar); return; }
-  if(p && !proyectoActual){ entrar(p.dataset.proy); return; }
-  if(mc){ marcarMaterial(mc.dataset.mcheck); return; }
-  if(g){ abrirGasto(proy().gastos.find(x=>x.id===g.dataset.gasto)); return; }
-  if(m){ abrirMaterial(proy().materiales.find(x=>x.id===m.dataset.mat)); return; }
-  if(i){ abrirIntegrante(proy().integrantes.find(x=>x.id===i.dataset.int)); return; }
-});
-$('btnPrincipal').addEventListener('click',()=>{
-  if(!proyectoActual) return abrirProyecto(null);
-  if(pestana==='gastos') return abrirGasto(null);
-  if(pestana==='materiales') return abrirMaterial(null);
-  abrirIntegrante(null);
-});
-
-function abrirOv(id){ $(id).classList.remove('hidden'); document.body.classList.add('bloqueado'); }
-function cerrar(id){ $(id).classList.add('hidden'); document.body.classList.remove('bloqueado'); }
-
-/* ================= Proyecto ================= */
-$('btnEditarProy').addEventListener('click',()=>abrirProyecto(proy()));
-function abrirProyecto(p){
-  editandoProy = p||null;
-  $('ovProyTit').textContent = p?'Editar proyecto':'Nuevo proyecto';
-  $('pBorrar').classList.toggle('hidden', !p);
-  $('pNombre').value = p?p.nombre:'';
-  $('pDesc').value = p?(p.desc||''):'';
-  $('pPresu').value = p&&p.presupuesto ? Number(p.presupuesto).toLocaleString('es-CO') : '';
-  document.querySelector('input[name=reparto][value="'+((p&&p.reparto)||'igual')+'"]').checked = true;
-  abrirOv('ovProy');
-  if(!p) setTimeout(()=>$('pNombre').focus(),80);
-}
-$('pGuardar').addEventListener('click',()=>{
-  const nombre=$('pNombre').value.trim();
-  if(!nombre){ toast('Falta el nombre del proyecto'); $('pNombre').focus(); return; }
-  const datos={nombre, desc:$('pDesc').value.trim(), presupuesto:soloNumeros($('pPresu').value),
-               reparto:document.querySelector('input[name=reparto]:checked').value};
-  const arr=leer();
-  if(editandoProy){ Object.assign(arr.find(x=>x.id===editandoProy.id), datos); guardar(arr); pintarProyecto(); }
-  else {
-    const nuevo = Object.assign({id:nuevoId(), creado:new Date().toISOString(), integrantes:[], gastos:[], materiales:[]}, datos);
-    arr.push(nuevo); guardar(arr); cerrar('ovProy'); entrar(nuevo.id); toast('Proyecto creado'); return;
-  }
-  cerrar('ovProy'); toast('Proyecto actualizado');
-});
-$('pBorrar').addEventListener('click',()=>{
-  if(!editandoProy) return;
-  if(!confirm('¿Borrar el proyecto "'+editandoProy.nombre+'" con todos sus gastos? No se puede recuperar.')) return;
-  guardar(leer().filter(x=>x.id!==editandoProy.id)); cerrar('ovProy'); irAProyectos(); toast('Proyecto borrado');
-});
-
-/* ================= Gastos ================= */
-function llenarQuien(sel){
-  const p=proy();
-  $('gQuien').innerHTML = '<option value="">Sin asignar</option>'+p.integrantes.map(i=>'<option value="'+i.id+'">'+escapar(i.nombre)+'</option>').join('');
-  $('gQuien').value = sel||'';
-}
-function abrirGasto(g, pre){
-  editandoGasto = g||null;
-  $('ovGastoTit').textContent = g?'Editar gasto':'Nuevo gasto';
-  $('gBorrar').classList.toggle('hidden', !g);
-  $('gDesc').value = g?g.desc:(pre?pre.desc:'');
-  $('gValor').value = g&&g.valor ? Number(g.valor).toLocaleString('es-CO') : (pre&&pre.estimado?Number(pre.estimado).toLocaleString('es-CO'):'');
-  $('gCant').value = g?(g.cant||''):(pre?(pre.cant||''):'');
-  $('gFecha').value = g?(g.fecha||hoyISO()):hoyISO();
-  $('gNota').value = g?(g.nota||''):'';
-  llenarQuien(g?g.quien:'');
-  $('ovGasto').dataset.material = pre?pre.id:'';
-  abrirOv('ovGasto');
-  if(!g) setTimeout(()=>$('gDesc').focus(),80);
-}
-$('gGuardar').addEventListener('click',()=>{
-  const desc=$('gDesc').value.trim(), valor=soloNumeros($('gValor').value);
-  if(!desc){ toast('Falta qué se compró'); $('gDesc').focus(); return; }
-  if(!valor){ toast('Falta el valor'); $('gValor').focus(); return; }
-  const datos={desc, valor, cant:soloNumeros($('gCant').value)||1, quien:$('gQuien').value, fecha:$('gFecha').value||hoyISO(), nota:$('gNota').value.trim()};
-  const matId = $('ovGasto').dataset.material;
-  guardarProy(p=>{
-    if(editandoGasto) Object.assign(p.gastos.find(x=>x.id===editandoGasto.id), datos);
-    else p.gastos.push(Object.assign({id:nuevoId()}, datos));
-    if(matId){ const m=p.materiales.find(x=>x.id===matId); if(m) m.comprado=true; }
-  });
-  cerrar('ovGasto'); pintarProyecto(); toast(editandoGasto?'Gasto actualizado':'Gasto agregado');
-});
-$('gBorrar').addEventListener('click',()=>{
-  if(!editandoGasto) return;
-  if(!confirm('¿Borrar el gasto "'+editandoGasto.desc+'"?')) return;
-  guardarProy(p=>{ p.gastos=p.gastos.filter(x=>x.id!==editandoGasto.id); });
-  cerrar('ovGasto'); pintarProyecto(); toast('Gasto borrado');
-});
-
-/* ================= Materiales ================= */
-function abrirMaterial(m){
-  editandoMat = m||null;
-  $('ovMatTit').textContent = m?'Editar material':'Nuevo material';
-  $('mBorrar').classList.toggle('hidden', !m);
-  $('mDesc').value = m?m.desc:'';
-  $('mCant').value = m?(m.cant||''):'';
-  $('mEst').value = m&&m.estimado ? Number(m.estimado).toLocaleString('es-CO') : '';
-  $('mNota').value = m?(m.nota||''):'';
-  abrirOv('ovMat');
-  if(!m) setTimeout(()=>$('mDesc').focus(),80);
-}
-$('mGuardar').addEventListener('click',()=>{
-  const desc=$('mDesc').value.trim();
-  if(!desc){ toast('Falta el material'); $('mDesc').focus(); return; }
-  const datos={desc, cant:soloNumeros($('mCant').value)||1, estimado:soloNumeros($('mEst').value), nota:$('mNota').value.trim()};
-  guardarProy(p=>{
-    if(editandoMat) Object.assign(p.materiales.find(x=>x.id===editandoMat.id), datos);
-    else p.materiales.push(Object.assign({id:nuevoId(), comprado:false}, datos));
-  });
-  cerrar('ovMat'); pintarProyecto(); toast(editandoMat?'Material actualizado':'Material agregado');
-});
-$('mBorrar').addEventListener('click',()=>{
-  if(!editandoMat) return;
-  if(!confirm('¿Borrar "'+editandoMat.desc+'" de la lista?')) return;
-  guardarProy(p=>{ p.materiales=p.materiales.filter(x=>x.id!==editandoMat.id); });
-  cerrar('ovMat'); pintarProyecto(); toast('Material borrado');
-});
-function marcarMaterial(id){
-  const p=proy(), m=p.materiales.find(x=>x.id===id); if(!m) return;
-  if(m.comprado){
-    guardarProy(pp=>{ pp.materiales.find(x=>x.id===id).comprado=false; });
-    pintarProyecto(); return;
-  }
-  if(confirm('¿Ya compraste "'+m.desc+'"? Se registra como gasto.')) abrirGasto(null, m);
-  else { guardarProy(pp=>{ pp.materiales.find(x=>x.id===id).comprado=true; }); pintarProyecto(); }
-}
-
-/* ================= Integrantes ================= */
-function abrirIntegrante(i){
-  editandoInt = i||null;
+/* ---------- pintar todo ---------- */
+function pintar(){
+  pintarCarrusel();
   const p = proy();
-  $('ovIntTit').textContent = i?'Editar integrante':'Nuevo integrante';
-  $('iBorrar').classList.toggle('hidden', !i);
-  $('iNombre').value = i?i.nombre:'';
-  $('iPct').value = i?(i.pct||''):'';
-  $('iNota').value = i?(i.nota||''):'';
-  $('campoPct').classList.toggle('hidden', p.reparto!=='pct');
-  abrirOv('ovInt');
-  if(!i) setTimeout(()=>$('iNombre').focus(),80);
+  if(!p){
+    $('todo').innerHTML = '<div class="aire">Aquí llevas las cuentas de cada proyecto:<br>lo que se compra, cuánto va y qué le toca poner a cada quien.<br><br>Crea el primero con <b>+ Proyecto</b>.</div>';
+    return;
+  }
+  const total = comprado(p);
+  const pendientes = p.compras.filter(c=>!c.valor);
+  const recaudado = p.gente.reduce((s,x)=>s+abonado(x),0);
+  const avance = p.presupuesto ? Math.min(100, total*100/p.presupuesto) : 0;
+
+  let h = '';
+
+  /* cabecera */
+  h += '<div class="cabeza"><div class="curva"></div>'
+    + '<button class="editar" data-editar-proy="1">Ajustes</button>'
+    + '<h1>'+esc(p.nombre)+'</h1>'
+    + (p.desc?'<div class="nota">'+esc(p.desc)+'</div>':'')
+    + '<div class="total"><span class="num">'+plata(total)+'</span>'
+    + '<div class="pie">'+(p.presupuesto ? 'de '+plata(p.presupuesto)+' presupuestados' : 'comprado hasta hoy')+'</div></div>'
+    + (p.presupuesto?'<div class="barra"><i style="width:'+avance+'%"></i></div>':'')
+    + '</div>';
+
+  /* compras */
+  h += '<section><h2>Lo que va comprado</h2>'
+    + '<p class="intro">Escribe qué compraste y cuánto costó. Si todavía no lo compras, déjalo sin valor y queda como pendiente.</p>'
+    + '<div class="rapido"><input id="nQue" placeholder="Qué se compró" autocomplete="off">'
+    + '<div class="sep"></div><input id="nVal" class="corto" inputmode="numeric" placeholder="Valor" autocomplete="off">'
+    + '<button data-agregar-compra="1">+</button></div>';
+  const compras = p.compras.slice().sort((a,b)=>String(b.fecha||'').localeCompare(String(a.fecha||'')));
+  h += compras.length ? compras.map(c=>'<div class="item" data-compra="'+c.id+'">'
+      + '<div class="punto'+(c.valor?'':' falta')+'"></div>'
+      + '<div class="q"><b>'+esc(c.que)+'</b><span>'+(c.valor?fecha(c.fecha):'pendiente')+(c.quien?' · '+esc(c.quien):'')+(c.nota?' · '+esc(c.nota):'')+'</span></div>'
+      + '<div class="v'+(c.valor?'':' falta')+'">'+(c.valor?plata(c.valor):'poner valor')+'</div></div>').join('')
+    : '<div class="vacio">Todavía no hay nada anotado.</div>';
+  h += '</section>';
+
+  /* gente */
+  h += '<section><h2>Quiénes ponen</h2>'
+    + '<p class="intro">Solo van los que aportan cuota. Si tú también vas a poner, agrégate como uno más.</p>';
+  if(p.reparto==='pct' && p.gente.length){
+    const suma = p.gente.reduce((s,x)=>s+pct(x.pct),0);
+    if(Math.abs(suma-100)>0.5) h += '<div class="aviso">Los porcentajes suman '+fp(suma)+'. Faltan '+fp(100-suma)+' por repartir.</div>';
+  }
+  h += '<div class="modo">'
+    + '<label><input type="radio" name="modo" value="igual"'+(p.reparto==='igual'?' checked':'')+'>Partes iguales</label>'
+    + '<label><input type="radio" name="modo" value="pct"'+(p.reparto==='pct'?' checked':'')+'>Por porcentaje</label></div>'
+    + '<div class="rapido"><input id="nNom" placeholder="Nombre del integrante" autocomplete="off">'
+    + (p.reparto==='pct'?'<div class="sep"></div><input id="nPct" class="corto" inputmode="decimal" placeholder="%" autocomplete="off">':'')
+    + '<button data-agregar-gente="1">+</button></div>';
+
+  h += '<div class="gente">' + (p.gente.length ? p.gente.map(x=>{
+      const cuota = cuotaDe(p,x), ab = abonado(x), falta = cuota-ab;
+      const avc = cuota>0 ? Math.min(100, ab*100/cuota) : 0;
+      const porcentaje = p.reparto==='igual' ? 100/p.gente.length : pct(x.pct);
+      return '<div class="persona"><div class="arriba">'
+        + '<div><div class="nom" data-gente="'+x.id+'">'+esc(x.nom)+'</div><div class="pct">'+fp(porcentaje)+' del gasto</div></div>'
+        + '<div class="cuota">'+plata(cuota)+'</div></div>'
+        + '<div class="avance"><i style="width:'+avc+'%"></i></div>'
+        + '<div class="abajo"><div class="estado '+(falta>0.5?'debe':'pago')+'">'
+        + (falta>0.5 ? 'Ha puesto '+plata(ab)+' · falta '+plata(falta) : (ab>cuota+0.5?'Puso de más '+plata(ab-cuota):'Ya está a paz y salvo'))
+        + '</div><button class="abonar" data-abonar="'+x.id+'">Abonó</button></div></div>';
+    }).join('') : '<div class="vacio">Agrega a los integrantes para repartir el gasto.</div>') + '</div></section>';
+
+  /* cierre */
+  h += '<div class="cierre">'
+    + '<div class="linea"><span>Comprado</span><b>'+plata(total)+'</b></div>'
+    + (pendientes.length?'<div class="linea"><span>Pendiente por comprar</span><b>'+pendientes.length+' cosa'+(pendientes.length===1?'':'s')+'</b></div>':'')
+    + '<div class="linea"><span>Recaudado de los integrantes</span><b>'+plata(recaudado)+'</b></div>'
+    + '<div class="linea fuerte"><span>Por recaudar</span><b>'+plata(Math.max(0, p.gente.reduce((s,x)=>s+Math.max(0,cuotaDe(p,x)-abonado(x)),0)))+'</b></div>'
+    + '<button class="boton" data-excel="1">Descargar en Excel</button>'
+    + '</div>';
+
+  $('todo').innerHTML = h;
+
+  const nq = $('nQue'); if(nq) nq.addEventListener('keydown',e=>{ if(e.key==='Enter') agregarCompra(); });
+  const nv = $('nVal'); if(nv){ formatear(nv); nv.addEventListener('keydown',e=>{ if(e.key==='Enter') agregarCompra(); }); }
+  const nn = $('nNom'); if(nn) nn.addEventListener('keydown',e=>{ if(e.key==='Enter') agregarGente(); });
+  document.querySelectorAll('input[name=modo]').forEach(el=>el.addEventListener('change',()=>{
+    editar(p=>{ p.reparto=el.value; }); pintar();
+  }));
 }
-$('iGuardar').addEventListener('click',()=>{
-  const nombre=$('iNombre').value.trim();
-  if(!nombre){ toast('Falta el nombre'); $('iNombre').focus(); return; }
-  const datos={nombre, pct:$('iPct').value.trim(), nota:$('iNota').value.trim()};
-  guardarProy(p=>{
-    if(editandoInt) Object.assign(p.integrantes.find(x=>x.id===editandoInt.id), datos);
-    else p.integrantes.push(Object.assign({id:nuevoId()}, datos));
-  });
-  cerrar('ovInt'); pintarProyecto(); toast(editandoInt?'Integrante actualizado':'Integrante agregado');
-});
-$('iBorrar').addEventListener('click',()=>{
-  if(!editandoInt) return;
-  const p=proy();
-  const suyos = p.gastos.filter(g=>g.quien===editandoInt.id).length;
-  if(!confirm('¿Borrar a '+editandoInt.nombre+'?'+(suyos?' Sus '+suyos+' gasto(s) quedan sin asignar.':''))) return;
-  guardarProy(pp=>{
-    pp.integrantes=pp.integrantes.filter(x=>x.id!==editandoInt.id);
-    pp.gastos.forEach(g=>{ if(g.quien===editandoInt.id) g.quien=''; });
-  });
-  cerrar('ovInt'); pintarProyecto(); toast('Integrante borrado');
+function formatear(el){
+  el.addEventListener('input',()=>{ const n=nums(el.value); el.value = n ? n.toLocaleString('es-CO') : ''; });
+}
+
+/* ---------- agregar rápido ---------- */
+function agregarCompra(){
+  const que = $('nQue').value.trim(), val = nums($('nVal').value);
+  if(!que){ aviso('Escribe qué se compró'); $('nQue').focus(); return; }
+  editar(p=>p.compras.push({id:id(), que, valor:val, fecha:val?hoy():'', quien:'', nota:''}));
+  pintar(); $('nQue').focus();
+}
+function agregarGente(){
+  const nom = $('nNom').value.trim();
+  if(!nom){ aviso('Escribe el nombre'); $('nNom').focus(); return; }
+  const p0 = proy();
+  const porcentaje = p0.reparto==='pct' ? ($('nPct')?$('nPct').value.trim():'') : '';
+  editar(p=>p.gente.push({id:id(), nom, pct:porcentaje, abonos:[]}));
+  pintar(); $('nNom').focus();
+}
+
+/* ---------- panel ---------- */
+function abrirPanel(html){
+  $('cajaPanel').innerHTML = html;
+  $('panel').classList.remove('oculto');
+  document.body.classList.add('quieto');
+}
+function cerrarPanel(){ $('panel').classList.add('oculto'); document.body.classList.remove('quieto'); }
+$('panel').addEventListener('click', e=>{ if(e.target.id==='panel') cerrarPanel(); });
+
+function panelProyecto(p){
+  abrirPanel('<h2>'+(p?'Ajustes del proyecto':'Nuevo proyecto')+'</h2>'
+    + '<div class="campo"><label for="pNom">Nombre</label><input id="pNom" value="'+esc(p?p.nombre:'')+'" placeholder="Cómo se llama el proyecto"></div>'
+    + '<div class="campo"><label for="pDes">De qué se trata</label><textarea id="pDes" placeholder="Opcional">'+esc(p?p.desc:'')+'</textarea></div>'
+    + '<div class="campo"><label for="pPre">Presupuesto (opcional)</label><input id="pPre" inputmode="numeric" value="'+(p&&p.presupuesto?Number(p.presupuesto).toLocaleString('es-CO'):'')+'" placeholder="Para ver cuánto llevas"></div>'
+    + '<button class="boton" data-guardar-proy="'+(p?p.id:'')+'">Guardar</button>'
+    + (p?'<button class="boton peligro" data-borrar-proy="'+p.id+'">Borrar este proyecto</button>':'')
+    + '<button class="boton suave" data-cerrar="1">Cancelar</button>');
+  formatear($('pPre'));
+  setTimeout(()=>$('pNom').focus(),90);
+}
+function panelCompra(c){
+  const p = proy();
+  abrirPanel('<h2>'+esc(c.que)+'</h2>'
+    + '<div class="campo"><label for="cQue">Qué se compró</label><input id="cQue" value="'+esc(c.que)+'"></div>'
+    + '<div class="campo"><label for="cVal">Valor</label><input id="cVal" inputmode="numeric" value="'+(c.valor?Number(c.valor).toLocaleString('es-CO'):'')+'" placeholder="Déjalo vacío si aún no se compra"></div>'
+    + '<div class="campo"><label for="cFec">Fecha</label><input id="cFec" type="date" value="'+(c.fecha||'')+'"></div>'
+    + '<div class="campo"><label for="cQui">Quién lo compró</label><input id="cQui" list="listaGente" value="'+esc(c.quien)+'" placeholder="Por defecto tú"></div>'
+    + '<datalist id="listaGente">'+p.gente.map(x=>'<option>'+esc(x.nom)+'</option>').join('')+'</datalist>'
+    + '<div class="campo"><label for="cNot">Nota</label><input id="cNot" value="'+esc(c.nota)+'" placeholder="Dónde se compró, factura"></div>'
+    + '<button class="boton" data-guardar-compra="'+c.id+'">Guardar</button>'
+    + '<button class="boton peligro" data-borrar-compra="'+c.id+'">Borrar</button>'
+    + '<button class="boton suave" data-cerrar="1">Cancelar</button>');
+  formatear($('cVal'));
+}
+function panelGente(x){
+  const p = proy();
+  const lista = (x.abonos||[]).slice().reverse();
+  abrirPanel('<h2>'+esc(x.nom)+'</h2>'
+    + '<div class="campo"><label for="gNom">Nombre</label><input id="gNom" value="'+esc(x.nom)+'"></div>'
+    + (p.reparto==='pct'?'<div class="campo"><label for="gPct">Porcentaje de aporte</label><input id="gPct" inputmode="decimal" value="'+esc(x.pct)+'" placeholder="Ej: 25"></div>':'')
+    + (lista.length?'<div class="campo"><label>Abonos</label>'+lista.map(a=>'<div class="item"><div class="q"><b>'+plata(a.valor)+'</b><span>'+fecha(a.fecha)+'</span></div><button class="abonar" data-quitar-abono="'+x.id+'|'+a.id+'">Quitar</button></div>').join('')+'</div>':'')
+    + '<button class="boton" data-guardar-gente="'+x.id+'">Guardar</button>'
+    + '<button class="boton peligro" data-borrar-gente="'+x.id+'">Quitar del proyecto</button>'
+    + '<button class="boton suave" data-cerrar="1">Cancelar</button>');
+}
+function panelAbono(x){
+  const falta = cuotaDe(proy(),x)-abonado(x);
+  abrirPanel('<h2>Abono de '+esc(x.nom)+'</h2>'
+    + '<p class="intro" style="margin:-8px 0 14px;color:var(--ink-2);font-size:13.5px">'+(falta>0.5?'Le falta '+plata(falta):'Ya está al día')+'</p>'
+    + '<div class="campo"><label for="aVal">Cuánto abonó</label><input id="aVal" inputmode="numeric" placeholder="Valor"></div>'
+    + '<div class="campo"><label for="aFec">Fecha</label><input id="aFec" type="date" value="'+hoy()+'"></div>'
+    + '<button class="boton" data-guardar-abono="'+x.id+'">Registrar abono</button>'
+    + '<button class="boton suave" data-cerrar="1">Cancelar</button>');
+  formatear($('aVal'));
+  if(falta>0.5) $('aVal').value = Math.round(falta).toLocaleString('es-CO');
+  setTimeout(()=>$('aVal').select(),90);
+}
+
+/* ---------- clics ---------- */
+document.addEventListener('click', e=>{
+  const t = sel => e.target.closest('['+sel+']');
+  let b;
+  if(t('data-cerrar')) return cerrarPanel();
+  if(b=t('data-ir')){ actual=b.dataset.ir; pintar(); window.scrollTo({top:0}); return; }
+  if(t('data-nuevo')) return panelProyecto(null);
+  if(t('data-editar-proy')) return panelProyecto(proy());
+  if(t('data-agregar-compra')) return agregarCompra();
+  if(t('data-agregar-gente')) return agregarGente();
+  if(b=t('data-compra')) return panelCompra(proy().compras.find(c=>c.id===b.dataset.compra));
+  if(b=t('data-abonar')) return panelAbono(proy().gente.find(x=>x.id===b.dataset.abonar));
+  if(b=t('data-gente')) return panelGente(proy().gente.find(x=>x.id===b.dataset.gente));
+  if(t('data-excel')) return excel();
+
+  if(b=t('data-guardar-proy')){
+    const nom=$('pNom').value.trim();
+    if(!nom){ aviso('Ponle nombre al proyecto'); return; }
+    const datos={nombre:nom, desc:$('pDes').value.trim(), presupuesto:nums($('pPre').value)};
+    const a=leer();
+    if(b.dataset.guardarProy){ Object.assign(a.find(p=>p.id===b.dataset.guardarProy), datos); grabar(a); }
+    else { const nuevo=Object.assign({id:id(), creado:new Date().toISOString(), reparto:'igual', compras:[], gente:[]}, datos); a.push(nuevo); grabar(a); actual=nuevo.id; }
+    cerrarPanel(); pintar(); return;
+  }
+  if(b=t('data-borrar-proy')){
+    const p=leer().find(x=>x.id===b.dataset.borrarProy);
+    if(!confirm('¿Borrar "'+p.nombre+'" con todas sus cuentas?')) return;
+    grabar(leer().filter(x=>x.id!==p.id)); actual=(leer()[0]||{}).id||null; cerrarPanel(); pintar(); return;
+  }
+  if(b=t('data-guardar-compra')){
+    const cid=b.dataset.guardarCompra, val=nums($('cVal').value);
+    editar(p=>{ const c=p.compras.find(x=>x.id===cid);
+      c.que=$('cQue').value.trim()||c.que; c.valor=val; c.fecha=$('cFec').value||(val?hoy():'');
+      c.quien=$('cQui').value.trim(); c.nota=$('cNot').value.trim(); });
+    cerrarPanel(); pintar(); return;
+  }
+  if(b=t('data-borrar-compra')){
+    editar(p=>{ p.compras=p.compras.filter(x=>x.id!==b.dataset.borrarCompra); });
+    cerrarPanel(); pintar(); return;
+  }
+  if(b=t('data-guardar-gente')){
+    const gid=b.dataset.guardarGente;
+    editar(p=>{ const x=p.gente.find(g=>g.id===gid);
+      x.nom=$('gNom').value.trim()||x.nom; if($('gPct')) x.pct=$('gPct').value.trim(); });
+    cerrarPanel(); pintar(); return;
+  }
+  if(b=t('data-borrar-gente')){
+    const x=proy().gente.find(g=>g.id===b.dataset.borrarGente);
+    if(!confirm('¿Quitar a '+x.nom+' del proyecto?')) return;
+    editar(p=>{ p.gente=p.gente.filter(g=>g.id!==x.id); });
+    cerrarPanel(); pintar(); return;
+  }
+  if(b=t('data-guardar-abono')){
+    const val=nums($('aVal').value);
+    if(!val){ aviso('Escribe cuánto abonó'); return; }
+    const gid=b.dataset.guardarAbono, fec=$('aFec').value||hoy();
+    editar(p=>{ const x=p.gente.find(g=>g.id===gid); x.abonos=x.abonos||[]; x.abonos.push({id:id(), valor:val, fecha:fec}); });
+    cerrarPanel(); pintar(); aviso('Abono registrado'); return;
+  }
+  if(b=t('data-quitar-abono')){
+    const [gid,aid]=b.dataset.quitarAbono.split('|');
+    editar(p=>{ const x=p.gente.find(g=>g.id===gid); x.abonos=x.abonos.filter(a=>a.id!==aid); });
+    cerrarPanel(); pintar(); return;
+  }
 });
 
-/* ================= Excel ================= */
+/* ---------- Excel ---------- */
 function excel(){
   const p=proy(); if(!p) return;
-  if(!window.XLSX){ toast('No se pudo cargar el generador de Excel. Revisa la conexión.'); return; }
-  const total=totalGastado(p);
-  const libro=XLSX.utils.book_new();
+  if(!window.XLSX){ aviso('No se pudo cargar el Excel. Revisa la conexión.'); return; }
+  const total=comprado(p), libro=XLSX.utils.book_new();
 
-  const gastos=p.gastos.slice().sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))).map(g=>({
-    'FECHA':fechaCorta(g.fecha), 'QUE SE COMPRO':g.desc, 'CANTIDAD':Number(g.cant)||1,
-    'VALOR':Number(g.valor)||0, 'QUIEN PAGO':nombreDe(p,g.quien), 'NOTA':g.nota||''
+  const compras=p.compras.slice().sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))).map(c=>({
+    'FECHA':fecha(c.fecha), 'QUE SE COMPRO':String(c.que).toLocaleUpperCase('es'),
+    'VALOR':c.valor||0, 'ESTADO':c.valor?'COMPRADO':'PENDIENTE',
+    'QUIEN COMPRO':String(c.quien||'').toLocaleUpperCase('es'), 'NOTA':String(c.nota||'').toLocaleUpperCase('es')
   }));
-  gastos.push({'FECHA':'','QUE SE COMPRO':'TOTAL','CANTIDAD':'','VALOR':total,'QUIEN PAGO':'','NOTA':''});
-  const h1=XLSX.utils.json_to_sheet(gastos);
-  h1['!cols']=[{wch:12},{wch:38},{wch:10},{wch:14},{wch:20},{wch:30}];
-  XLSX.utils.book_append_sheet(libro,h1,'GASTOS');
+  compras.push({'FECHA':'','QUE SE COMPRO':'TOTAL','VALOR':total,'ESTADO':'','QUIEN COMPRO':'','NOTA':''});
+  const h1=XLSX.utils.json_to_sheet(compras);
+  h1['!cols']=[{wch:12},{wch:40},{wch:14},{wch:12},{wch:20},{wch:30}];
+  XLSX.utils.book_append_sheet(libro,h1,'COMPRAS');
 
-  const resumen=p.integrantes.map(i=>{
-    const pct=porcentajeDe(p,i.id), corr=total*pct/100;
-    const pag=p.gastos.filter(g=>g.quien===i.id).reduce((s,g)=>s+(Number(g.valor)||0),0);
-    return {'INTEGRANTE':i.nombre,'PORCENTAJE':Math.round(pct*10)/10,'LE CORRESPONDE':Math.round(corr),
-            'HA PUESTO':pag,'DIFERENCIA':Math.round(pag-corr),
-            'ESTADO':Math.abs(pag-corr)<1?'AL DIA':(pag>corr?'LE DEBEN':'DEBE PONER')};
+  const gente=p.gente.map(x=>{
+    const cuota=cuotaDe(p,x), ab=abonado(x);
+    return {'INTEGRANTE':String(x.nom).toLocaleUpperCase('es'),
+      'PORCENTAJE':Math.round((p.reparto==='igual'?100/p.gente.length:pct(x.pct))*10)/10,
+      'CUOTA':Math.round(cuota),'ABONADO':ab,'FALTA':Math.round(Math.max(0,cuota-ab)),
+      'ESTADO':(cuota-ab)>0.5?'DEBE':'AL DIA'};
   });
-  const h2=XLSX.utils.json_to_sheet(resumen);
-  h2['!cols']=[{wch:24},{wch:12},{wch:18},{wch:16},{wch:16},{wch:14}];
-  XLSX.utils.book_append_sheet(libro,h2,'INTEGRANTES');
+  const h2=XLSX.utils.json_to_sheet(gente);
+  h2['!cols']=[{wch:26},{wch:12},{wch:16},{wch:16},{wch:16},{wch:12}];
+  XLSX.utils.book_append_sheet(libro,h2,'CUOTAS');
 
-  const mats=p.materiales.map(m=>({'MATERIAL':m.desc,'CANTIDAD':Number(m.cant)||1,
-    'VALOR ESTIMADO':Number(m.estimado)||0,'ESTADO':m.comprado?'COMPRADO':'POR COMPRAR','NOTA':m.nota||''}));
-  if(mats.length){
-    const h3=XLSX.utils.json_to_sheet(mats);
-    h3['!cols']=[{wch:38},{wch:10},{wch:16},{wch:16},{wch:30}];
-    XLSX.utils.book_append_sheet(libro,h3,'MATERIALES');
+  const abonos=[];
+  p.gente.forEach(x=>(x.abonos||[]).forEach(a=>abonos.push({
+    'FECHA':fecha(a.fecha),'INTEGRANTE':String(x.nom).toLocaleUpperCase('es'),'ABONO':a.valor})));
+  if(abonos.length){
+    abonos.sort((a,b)=>String(a.FECHA).localeCompare(String(b.FECHA)));
+    const h3=XLSX.utils.json_to_sheet(abonos);
+    h3['!cols']=[{wch:12},{wch:26},{wch:16}];
+    XLSX.utils.book_append_sheet(libro,h3,'ABONOS');
   }
-  XLSX.writeFile(libro, p.nombre.replace(/[\\/:*?"<>|]/g,'-')+' '+hoyISO()+'.xlsx');
+  XLSX.writeFile(libro, p.nombre.replace(/[\\/:*?"<>|]/g,'-')+' '+hoy()+'.xlsx');
 }
 
-/* ================= Respaldo ================= */
-$('btnExport').addEventListener('click',()=>{
-  const b=new Blob([JSON.stringify(leer())],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
-  a.download='respaldo-proyectos-'+hoyISO()+'.json'; a.click(); URL.revokeObjectURL(a.href);
-});
-$('btnImport').addEventListener('click',()=>$('fileImport').click());
-$('fileImport').addEventListener('change',e=>{
-  const f=e.target.files[0]; if(!f) return;
-  const fr=new FileReader();
-  fr.onload=()=>{
-    try{
-      const n=JSON.parse(fr.result); if(!Array.isArray(n)) throw 0;
-      const act=leer(), ids=new Set(act.map(x=>x.id));
-      const sumar=n.filter(x=>!ids.has(x.id));
-      guardar(act.concat(sumar)); pintarProyectos(); toast('Se agregaron '+sumar.length+' proyectos');
-    }catch(err){ toast('Ese archivo no sirve como respaldo'); }
-  };
-  fr.readAsText(f); e.target.value='';
-});
-
-irAProyectos();
+/* ---------- arranque ---------- */
+actual = (leer()[0]||{}).id || null;
+pintar();
 </script>
 </body>
 </html>
