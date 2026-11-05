@@ -81,9 +81,17 @@ li{border-bottom:1px solid var(--linea)}
 .panelx{background:var(--panel); border:1px solid var(--linea); padding:14px; margin:0 0 12px}
 .panelx h4{margin:0 0 8px; font-size:12px; letter-spacing:.08em; color:var(--tenue); font-weight:600}
 .bloques{margin:0 0 12px}
-.bloque{display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px dashed var(--linea); font-size:14px}
-.bloque span{flex:1}
+.bloque{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:7px 0; border-bottom:1px dashed var(--linea); font-size:14px}
+.bloque span{flex:1 1 130px; min-width:0; overflow-wrap:anywhere}
+.bloque button{flex:0 0 auto}
+.bloque .mini{padding:4px 8px; font-size:12.5px}
 .bloque.act{color:var(--rojo)}
+.mover{display:flex; flex-direction:column; gap:2px; flex:0 0 auto}
+.flecha{background:transparent; border:1px solid var(--linea); color:var(--tenue);
+  width:28px; height:17px; padding:0; font-size:9px; line-height:1;
+  display:flex; align-items:center; justify-content:center}
+.flecha:active{color:var(--crema); border-color:var(--rojo)}
+.flecha:disabled{opacity:.22}
 .form{display:flex; gap:8px; flex-wrap:wrap}
 .form>*{flex:1 1 100%}
 .form .med{flex:1 1 calc(50% - 4px)}
@@ -319,6 +327,17 @@ function terminar(it, sinSnap){
   S.actual = sig && sig.id !== it.id ? sig.id : null;
   abierto = null; rellenarSiVacio(); actual(); guardar(); pintar();
 }
+function moverBloque(it, ix, dir){
+  const j = ix + dir;
+  if(j < 0 || j >= it.bloques.length) return;
+  snap();
+  const tmp = it.bloques[ix];
+  it.bloques[ix] = it.bloques[j];
+  it.bloques[j] = tmp;
+  if(it.prog.b === ix) it.prog.b = j;
+  else if(it.prog.b === j) it.prog.b = ix;
+  guardar(); pintarLista();
+}
 function borrar(it){
   if(!confirm('¿Eliminar "'+it.n+'" de todas las listas? Se puede deshacer.')) return;
   snap();
@@ -445,9 +464,17 @@ function detalle(it){
   if(!it.bloques.length) cont.append(el('div','vacio','Sin temporadas ni películas agregadas.'));
   it.bloques.forEach((b,ix)=>{
     const f = el('div','bloque'+(it.prog.b===ix?' act':''));
+    const mover = el('div','mover');
+    const arriba = el('button','flecha','▲');
+    arriba.disabled = ix === 0;
+    arriba.onclick = ()=> moverBloque(it, ix, -1);
+    const abajo = el('button','flecha','▼');
+    abajo.disabled = ix === it.bloques.length - 1;
+    abajo.onclick = ()=> moverBloque(it, ix, 1);
+    mover.append(arriba, abajo);
     const txt = el('span','', b.tipo + (b.et?' '+b.et:'') + (b.eps?' — '+b.eps+' episodios':''));
     if(b.tope) txt.append(el('span','tope',' · 3000 min'));
-    f.append(txt);
+    f.append(mover, txt);
     const marcar = el('button','mini', it.prog.b===ix?'aquí voy':'marcar');
     marcar.onclick = ()=>{ snap(); it.prog.b = ix; guardar(); pintarLista(); };
     const tope = el('button','mini'+(b.tope?' on':''), '3000');
@@ -461,7 +488,7 @@ function detalle(it){
     f.append(marcar, tope, quitar); cont.append(f);
   });
   p.append(cont);
-  p.append(el('div','vacio','El botón 3000 marca la temporada donde se cumplen los 3000 minutos. Al terminarla, la página te pregunta si sigues o lo pausas.'));
+  p.append(el('div','vacio','Con las flechas ▲▼ acomodas el orden. El botón 3000 marca la temporada donde se cumplen los 3000 minutos: al terminarla, la página te pregunta si sigues o lo pausas.'));
 
   /* agregar bloque */
   const form = el('div','form');
